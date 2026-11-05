@@ -1,0 +1,20 @@
+{
+  "name": "Ponti — imparare insieme, senza fretta",
+  "short_name": "Ponti",
+  "description": "Ambiente di apprendimento accessibile per profili neuroevolutivi complessi (White-Sutton / POGZ).",
+  "lang": "it",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#faf6ee",
+  "theme_color": "#1e4f45",
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
