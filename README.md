@@ -15,6 +15,18 @@ npm run preview    # anteprima del build
 
 Il build è relativo (`base: './'`) e non richiede un server: può essere impacchettato con Capacitor senza riscrivere il frontend.
 
+## Controlli automatici
+
+Prima di ogni deploy il workflow esegue il typecheck, il build di produzione e un audit WCAG con Playwright e axe-core su landing, cassaforte, Oggi, Guida e impostazioni. Per ripeterlo in locale:
+
+```bash
+npm run build
+npx playwright install chromium
+npm run test:a11y
+```
+
+L’audit automatico copre i controlli WCAG rilevabili dal browser; non sostituisce una prova manuale con tastiera e lettore di schermo.
+
 ## Pubblicazione
 
 Il sito è pubblicato su GitHub Pages a ogni push su `main`:

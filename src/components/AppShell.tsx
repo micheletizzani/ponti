@@ -64,14 +64,10 @@ export function AppShell({
           <nav aria-label="Sezioni dell’app" className="hidden items-center gap-1 lg:flex">
             <NavLinks current={current} />
           </nav>
-          <button
-            type="button"
-            onClick={onOpenSettings}
-            className="ponti-btn-quiet min-h-16 px-4"
-            aria-label="Apri le impostazioni di lettura"
-          >
+          <button type="button" onClick={onOpenSettings} className="ponti-btn-quiet min-h-16 px-4">
             <span aria-hidden="true" className="text-xl">Aa</span>
             <span className="hidden sm:inline">Impostazioni</span>
+            <span className="sr-only sm:hidden">Impostazioni di lettura</span>
           </button>
         </div>
       </header>

@@ -118,7 +118,7 @@ export function Landing({ onOpenSettings }: { onOpenSettings: () => void }) {
                 ],
               ].map(([title, text], index) => (
                 <div key={title} className="border-t-2 border-ink pt-5">
-                  <p className="font-display text-5xl leading-none text-line-strong" aria-hidden="true">
+                  <p className="font-display text-5xl leading-none text-ink-soft" aria-hidden="true">
                     0{index + 1}
                   </p>
                   <h3 className="mt-4 text-2xl leading-snug">{title}</h3>
@@ -149,7 +149,7 @@ export function Landing({ onOpenSettings }: { onOpenSettings: () => void }) {
                     href={`#${module.path}`}
                     className="group grid gap-4 py-7 transition-colors hover:bg-surface sm:grid-cols-[4rem_1.1fr_1.4fr_auto] sm:items-baseline sm:px-3"
                   >
-                    <span className="font-display text-2xl text-line-strong" aria-hidden="true">
+                    <span className="font-display text-2xl text-ink-soft" aria-hidden="true">
                       0{index + 1}
                     </span>
                     <div>

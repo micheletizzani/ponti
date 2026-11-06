@@ -92,7 +92,12 @@ export function Guide() {
             </dl>
 
             <h3 className="mt-8 text-xl">Struttura delle cartelle</h3>
-            <pre className="mt-3 overflow-x-auto rounded-card border border-line bg-surface p-4 text-sm leading-relaxed">
+            <pre
+              tabIndex={0}
+              role="region"
+              aria-label="Struttura delle cartelle"
+              className="mt-3 overflow-x-auto rounded-card border border-line bg-surface p-4 text-sm leading-relaxed"
+            >
 {`src/
   components/   shell, dialoghi, arte SVG, player e Story Studio, registratore
   data/         stimoli, storie native e contenuti clinici (nessuna logica)
@@ -177,7 +182,7 @@ doc/            documentazione clinica di partenza`}
             </div>
 
             <h3 className="mt-8 text-xl">Token principali</h3>
-            <div className="mt-3 overflow-x-auto">
+            <div className="mt-3 overflow-x-auto" tabIndex={0} role="region" aria-label="Token cromatici e ruolo">
               <table className="w-full min-w-[34rem] border-collapse text-left text-base">
                 <caption className="sr-only">Token cromatici e ruolo</caption>
                 <thead>
@@ -216,7 +221,12 @@ doc/            documentazione clinica di partenza`}
               corrispondenza tra principio e implementazione reale.
             </p>
 
-            <div className="mt-6 overflow-x-auto">
+            <div
+              className="mt-6 overflow-x-auto"
+              tabIndex={0}
+              role="region"
+              aria-label="Principi di accessibilità cognitiva e implementazione"
+            >
               <table className="w-full min-w-[42rem] border-collapse text-left text-base">
                 <caption className="sr-only">Principi di accessibilità cognitiva e implementazione</caption>
                 <thead>
@@ -369,7 +379,7 @@ doc/            documentazione clinica di partenza`}
               <code>Patient</code>, <code>CarePlan</code> e una <code>Observation</code> per sessione, con codici locali
               finché LOINC e SNOMED CT non saranno validati dall’équipe.
             </p>
-            <div className="mt-4 overflow-x-auto">
+            <div className="mt-4 overflow-x-auto" tabIndex={0} role="region" aria-label="Metriche registrate e mappatura FHIR">
               <table className="w-full min-w-[40rem] border-collapse text-left text-base">
                 <caption className="sr-only">Metriche registrate e mappatura FHIR</caption>
                 <thead>
