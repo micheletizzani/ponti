@@ -17,7 +17,7 @@ Il build è relativo (`base: './'`) e non richiede un server: può essere impacc
 
 ## Controlli automatici
 
-Prima di ogni deploy il workflow esegue il typecheck, il build di produzione e un audit WCAG con Playwright e axe-core su landing, cassaforte, Oggi, Guida e impostazioni. Per ripeterlo in locale:
+Prima di ogni deploy il workflow esegue il typecheck, il build di produzione e un audit WCAG con Playwright e axe-core su landing, cassaforte, Oggi, Guida e impostazioni. L’audit apre davvero la cassaforte e controlla anche le sei schermate dei moduli: Sintassi, Matrix-Talk, Ritmo, Trama, Social Deck e Storie. Per ripeterlo in locale:
 
 ```bash
 npm run build
