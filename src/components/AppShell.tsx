@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { BrandMark } from './Brand';
+import { PrototypeNotice } from './PrototypeNotice';
 import { navigate } from '../lib/router';
 import { useAppStore } from '../lib/store';
 import { handoffLabel } from '../lib/words';
@@ -96,6 +97,7 @@ export function AppShell({
       >
         Vai al contenuto
       </button>
+      <PrototypeNotice />
       <header className="sticky top-0 z-40 border-b border-line bg-paper">
         <div className="mx-auto flex max-w-shell items-center justify-between gap-4 px-4 py-3 sm:px-6">
           <a href="#/app" className="flex min-h-16 items-center gap-3 rounded-xl pr-2">

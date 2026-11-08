@@ -29,6 +29,7 @@ async function expectNoViolations(page: Page, screen: string) {
 test('landing pubblica senza violazioni WCAG', async ({ page }) => {
   await page.goto('/#/');
   await expect(page.getByRole('heading', { level: 1, name: /Imparare insieme/ })).toBeVisible();
+  await expect(page.getByText('Prototipo di prova.')).toBeVisible();
   await expectNoViolations(page, 'landing');
 });
 

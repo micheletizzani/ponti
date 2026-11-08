@@ -1,6 +1,7 @@
 import { BrandMark, WaveMotif } from '../components/Brand';
 import { TwoPeopleMotif } from '../components/CharacterArt';
 import { MODULES } from '../data/content';
+import { PrototypeNotice } from '../components/PrototypeNotice';
 
 function scrollTo(id: string) {
   document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -21,6 +22,7 @@ export function Landing({ onOpenSettings }: { onOpenSettings: () => void }) {
         Vai al contenuto
       </button>
 
+      <PrototypeNotice />
       <header className="border-b border-line">
         <div className="mx-auto flex max-w-shell flex-wrap items-center justify-between gap-3 px-4 py-3 sm:px-6">
           <a href="#/" className="flex min-h-16 items-center gap-3 rounded-xl">
