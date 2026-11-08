@@ -43,6 +43,16 @@ export interface EncryptedStory {
   cipher: ArrayBuffer;
 }
 
+/** Tipi di record dell'area adulti: il tipo è in chiaro, il contenuto no. */
+export type RecordKind = 'diary' | 'goal' | 'schedule';
+
+export interface EncryptedRecord {
+  id: string;
+  kind: RecordKind;
+  iv: Uint8Array<ArrayBuffer>;
+  cipher: ArrayBuffer;
+}
+
 export interface EncryptedRecording {
   id: string;
   metaIv: Uint8Array<ArrayBuffer>;
@@ -59,6 +69,8 @@ class PontiDatabase extends Dexie {
   sessionsEnc!: Table<EncryptedSession, string>;
   recordingsEnc!: Table<EncryptedRecording, string>;
   storiesEnc!: Table<EncryptedStory, string>;
+  /** Diario scuola-casa, obiettivi condivisi e agende personalizzate. */
+  recordsEnc!: Table<EncryptedRecord, string>;
   /** Cache pubblica dei pittogrammi CAA: nessun dato del bambino. */
   caaSymbols!: Table<CachedSymbol, string>;
 
@@ -80,6 +92,10 @@ class PontiDatabase extends Dexie {
     // Cache dei pittogrammi pubblici: solo immagini e parole, mai dati del bambino.
     this.version(4).stores({
       caaSymbols: 'id, label, cachedAt',
+    });
+    // Area adulti: note e obiettivi riguardano il bambino, quindi sempre cifrati.
+    this.version(5).stores({
+      recordsEnc: 'id, kind',
     });
   }
 }

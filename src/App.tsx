@@ -14,6 +14,10 @@ import { SyntaxEngine } from './modules/SyntaxEngine';
 import { SpeechPacer } from './modules/SpeechPacer';
 import { NarrativeWeaver } from './modules/NarrativeWeaver';
 import { SocialDeck } from './modules/SocialDeck';
+import { AdultRoutes } from './pages/AdultSpace';
+import { Agenda } from './pages/Agenda';
+import { Retell } from './pages/Retell';
+import { Feelings } from './pages/Feelings';
 
 function NotFound() {
   return (
@@ -34,6 +38,11 @@ function NotFound() {
 }
 
 function AppRoutes({ path }: { path: string }) {
+  const adult = /^\/app\/(famiglia|scuola)(?:\/([a-z-]+))?$/.exec(path);
+  if (adult) {
+    const role = adult[1] === 'scuola' ? 'scuola' : 'famiglia';
+    return <AdultRoutes key={role} role={role} sub={adult[2] ?? ''} />;
+  }
   switch (path) {
     case '/app':
       return <Today />;
@@ -53,6 +62,12 @@ function AppRoutes({ path }: { path: string }) {
       return <Stories />;
     case '/app/progressi':
       return <Progress />;
+    case '/app/agenda':
+      return <Agenda />;
+    case '/app/racconta':
+      return <Retell />;
+    case '/app/come-sto':
+      return <Feelings />;
     case '/app/guida':
       return <Guide />;
     default:

@@ -5,6 +5,8 @@ import { TopicIcon } from '../components/Brand';
 import { ExerciseHeader, Feedback, FinishSession, LockNotice, TaskPrompt } from '../components/ui';
 import { useGuidedVoice, useSessionTracker } from '../lib/hooks';
 import { useAppStore } from '../lib/store';
+import { latestStory, useRecords } from '../lib/records';
+import { childWords, genderize, relativeDay } from '../lib/words';
 
 export function SocialDeck() {
   const [scaffold, setScaffold] = useState<ScaffoldLevel>(1);
@@ -17,6 +19,22 @@ export function SocialDeck() {
   const tracker = useSessionTracker('sociale', scaffold);
 
   const interests = profile.interests.length > 0 ? profile.interests : SOCIAL_TOPICS.map((topic) => topic.id);
+  const { items: diary } = useRecords('diary');
+  const story = latestStory(diary);
+  const firstMoment = story?.moments[0];
+
+  // La tessera Novità nasce dal diario: un argomento vero e nuovo, al posto della domanda già nota.
+  const news: SocialTopic | null =
+    story && firstMoment
+      ? {
+          id: 'novita',
+          label: `Una novità di ${relativeDay(story.date)}`,
+          script: `Sai cosa ho fatto ${relativeDay(story.date)}? ${genderize(firstMoment.text, profile.gender).replace(/\.$/, '')}! E tu cosa hai fatto?`,
+          adultPrompt: 'Rispondi con una tua novità della giornata, poi chiedi un dettaglio: «Con chi?» oppure «Ti è piaciuto?».',
+          icon: 'news',
+        }
+      : null;
+  const topics = news ? [news, ...SOCIAL_TOPICS] : SOCIAL_TOPICS;
 
   return (
     <div className="space-y-6">
@@ -29,8 +47,9 @@ export function SocialDeck() {
 
       {selected === null ? (
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3" aria-label="Argomenti">
-          {SOCIAL_TOPICS.map((topic) => {
-            const preferred = interests.includes(topic.label.toLowerCase()) || interests.includes(topic.id);
+          {topics.map((topic) => {
+            const preferred =
+              topic.id === 'novita' || interests.includes(topic.label.toLowerCase()) || interests.includes(topic.id);
             return (
               <button
                 key={topic.id}
@@ -47,7 +66,11 @@ export function SocialDeck() {
                   <TopicIcon name={topic.icon} />
                 </span>
                 <span className="text-lg font-bold">{topic.label}</span>
-                {preferred && <span className="text-sm font-bold text-accent-ink">Un tuo interesse</span>}
+                {preferred && (
+                  <span className="text-sm font-bold text-accent-ink">
+                    {topic.id === 'novita' ? 'Dal diario' : 'Un tuo interesse'}
+                  </span>
+                )}
               </button>
             );
           })}
@@ -101,7 +124,7 @@ export function SocialDeck() {
               <p className="ponti-label">Per chi ti ascolta</p>
               <p className="mt-2 text-base text-ink-soft">{selected.adultPrompt}</p>
               <p className="mt-2 text-sm text-ink-soft">
-                Se il bambino ripete una domanda a risposta nota, offri questa tessera come alternativa: serve a stare
+                Se {childWords(profile.gender, '').noun} ripete una domanda a risposta nota, offri questa tessera come alternativa: serve a stare
                 insieme, non a interrogare.
               </p>
             </aside>

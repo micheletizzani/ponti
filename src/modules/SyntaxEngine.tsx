@@ -44,7 +44,8 @@ export function SyntaxEngine() {
   const tracker = useSessionTracker('sintassi', scaffold);
 
   const round = SYNTAX_ROUNDS[roundIndex] ?? SYNTAX_ROUNDS[0]!;
-  const characters: CharacterId[] = [round.agent, round.patient];
+  // L'ordine delle tessere si alterna: «la prima tessera è chi agisce» non deve diventare un trucco.
+  const characters: CharacterId[] = roundIndex % 2 === 0 ? [round.agent, round.patient] : [round.patient, round.agent];
   const passiveStem = round.verbPassive.replace(/ da$/, '');
 
   const complete = first !== null && last !== null && form !== null;

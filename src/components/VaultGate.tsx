@@ -14,6 +14,7 @@ export function VaultGate({ children }: { children: ReactNode }) {
   const setVaultUnlocked = useAppStore((state) => state.setVaultUnlocked);
   const ephemeral = useAppStore((state) => state.ephemeral);
   const setEphemeral = useAppStore((state) => state.setEphemeral);
+  const setAdultOpen = useAppStore((state) => state.setAdultOpen);
 
   const [status, setStatus] = useState<GateStatus>('checking');
   const [passphrase, setPassphrase] = useState('');
@@ -60,6 +61,9 @@ export function VaultGate({ children }: { children: ReactNode }) {
         await setupVault(passphrase);
         setStatus('unlocked');
         setVaultUnlocked(true);
+        // Chi ha appena scritto la passphrase è un adulto: l'area adulti resta aperta
+        // finché non passa il tablet al bambino.
+        setAdultOpen(true);
         setEphemeral(false);
         setPassphrase('');
         setConfirmation('');
@@ -88,6 +92,7 @@ export function VaultGate({ children }: { children: ReactNode }) {
       }
       setStatus('unlocked');
       setVaultUnlocked(true);
+      setAdultOpen(true);
       setEphemeral(false);
       setPassphrase('');
     } catch (caught) {
@@ -170,7 +175,8 @@ export function VaultGate({ children }: { children: ReactNode }) {
               Passphrase
             </label>
             <p id="vault-passphrase-help" className="mt-1 text-sm text-ink-soft">
-              Almeno 8 caratteri. La passphrase non viene salvata da nessuna parte.
+              Una frase segreta che conoscono solo gli adulti, di almeno 8 caratteri (per esempio «gatto blu sul
+              tetto»). Non viene salvata da nessuna parte.
             </p>
             <input
               id="vault-passphrase"

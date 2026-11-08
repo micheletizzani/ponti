@@ -24,7 +24,8 @@ const scene = (
 const CREATED = '2026-11-05T09:00:00.000Z';
 
 /**
- * Storie precaricate, costruite sulla formula di Gray 10.2:
+ * Storie precaricate, costruite sulla formula di Gray 10.2, in prima persona.
+ * Il marcatore {o|a} viene accordato al profilo del bambino o della bambina:
  * ogni frase è etichettata e il rapporto descrittive/guida resta ≥ 2.
  * Non contengono dati del bambino: non vengono salvate nella cassaforte.
  */
@@ -33,7 +34,7 @@ export const NATIVE_STORIES: SocialStory[] = [
     id: 'passarsi-la-palla',
     title: 'Chiacchierare è come passarsi la palla',
     category: 'social_interaction',
-    protagonist: 'Leo',
+    protagonist: '',
     goal: 'Trovare un’altra cosa da dire quando la domanda ha già una risposta conosciuta.',
     createdAt: CREATED,
     updatedAt: CREATED,
@@ -97,7 +98,7 @@ export const NATIVE_STORIES: SocialStory[] = [
       ),
     ],
     check: {
-      question: 'Cosa può fare Leo quando conosce già la risposta?',
+      question: 'Cosa puoi fare quando conosci già la risposta?',
       options: [
         {
           id: 'palla-si',
@@ -119,7 +120,7 @@ export const NATIVE_STORIES: SocialStory[] = [
     id: 'treno-delle-parole',
     title: 'Il treno delle mie parole',
     category: 'speech_regulation',
-    protagonist: 'Leo',
+    protagonist: '',
     goal: 'Normalizzare il blocco della parola e ricordare che respiro e CAA sono strade legittime.',
     createdAt: CREATED,
     updatedAt: CREATED,
@@ -152,10 +153,10 @@ export const NATIVE_STORIES: SocialStory[] = [
       scene(
         'treno-4',
         'perspective',
-        'Quando una parola si ferma, io posso sentirmi arrabbiato o stanco. È normale sentirsi così.',
+        'Quando una parola si ferma, io posso sentirmi arrabbiat{o|a} o stanc{o|a}. È normale sentirsi così.',
         'bambino',
         'Un bambino con le sopracciglia aggrottate',
-        ['arrabbiato', 'normale'],
+        ['arrabbiat', 'normale'],
       ),
       scene(
         'treno-5',
@@ -191,7 +192,7 @@ export const NATIVE_STORIES: SocialStory[] = [
       ),
     ],
     check: {
-      question: 'Cosa può fare Leo se la parola si ferma?',
+      question: 'Cosa puoi fare se la parola si ferma?',
       options: [
         {
           id: 'treno-si',
@@ -213,7 +214,7 @@ export const NATIVE_STORIES: SocialStory[] = [
     id: 'programmi-altra-strada',
     title: 'Quando i programmi prendono un’altra strada',
     category: 'daily_routines',
-    protagonist: 'Leo',
+    protagonist: '',
     goal: 'Trovare un appoggio quando un’attività cambia all’improvviso.',
     createdAt: CREATED,
     updatedAt: CREATED,
@@ -222,10 +223,10 @@ export const NATIVE_STORIES: SocialStory[] = [
       scene(
         'strada-1',
         'descriptive',
-        'Ogni giorno a scuola e a casa ci sono attività che conosco bene. Guardare la mia agenda visiva mi fa sentire tranquillo.',
+        'Ogni giorno a scuola e a casa ci sono attività che conosco bene. Guardare la mia agenda visiva mi fa sentire tranquill{o|a}.',
         'agenda',
         'Un’agenda con tessere e una spunta',
-        ['agenda', 'tranquillo'],
+        ['agenda', 'tranquill'],
       ),
       scene(
         'strada-2',
@@ -238,10 +239,10 @@ export const NATIVE_STORIES: SocialStory[] = [
       scene(
         'strada-3',
         'perspective',
-        'Quando le cose cambiano, posso sentirmi sorpreso o confuso. Anche ai grandi capita.',
+        'Quando le cose cambiano, posso sentirmi sorpres{o|a} o confus{o|a}. Anche ai grandi capita.',
         'bambino',
         'Un bambino sorpreso, con un punto interrogativo',
-        ['sorpreso', 'confuso'],
+        ['sorpres', 'confus'],
       ),
       scene(
         'strada-4',
@@ -269,7 +270,7 @@ export const NATIVE_STORIES: SocialStory[] = [
       ),
     ],
     check: {
-      question: 'Cosa può fare Leo se il programma cambia?',
+      question: 'Cosa puoi fare se il programma cambia?',
       options: [
         {
           id: 'strada-si',
@@ -283,6 +284,229 @@ export const NATIVE_STORIES: SocialStory[] = [
           correct: false,
           feedback:
             'La storia accoglie la sorpresa e propone qualcosa da fare mentre il programma cambia. Rileggi la pagina e prova.',
+        },
+      ],
+    },
+  },
+  {
+    id: 'non-mi-capiscono',
+    title: 'Quando non mi capiscono subito',
+    category: 'speech_regulation',
+    protagonist: '',
+    goal: 'Riconoscere la frustrazione quando una parola non viene capita e avere altre strade pronte.',
+    createdAt: CREATED,
+    updatedAt: CREATED,
+    native: true,
+    scenes: [
+      scene('capire-1', 'descriptive', 'Io ho tante cose da dire alle persone che conosco.', 'parole', 'Due nuvolette di parole', [
+        'cose da dire',
+      ]),
+      scene(
+        'capire-2',
+        'descriptive',
+        'A volte dico una parola e l’altra persona non la capisce subito.',
+        'bambino',
+        'Un bambino con una nuvola di pensiero',
+        ['non la capisce'],
+      ),
+      scene(
+        'capire-3',
+        'perspective',
+        'L’altra persona vuole capirmi. Per questo mi chiede di nuovo o mi guarda con attenzione.',
+        'maestra',
+        'Una persona che ascolta con attenzione',
+        ['vuole capirmi'],
+      ),
+      scene(
+        'capire-4',
+        'perspective',
+        'Quando non mi capiscono, posso sentirmi arrabbiat{o|a}. È normale.',
+        'bambino',
+        'Un bambino con le sopracciglia aggrottate',
+        ['arrabbiat', 'normale'],
+      ),
+      scene(
+        'capire-5',
+        'coaching',
+        'Posso provare a indicare, a fare un gesto o a mostrare una figura sul tablet.',
+        'tablet',
+        'Un tablet con una figura da toccare',
+        ['indicare', 'gesto', 'figura'],
+      ),
+      scene(
+        'capire-6',
+        'descriptive',
+        'Spesso, con un gesto o una figura, l’altra persona capisce e dice la parola insieme a me.',
+        'famiglia',
+        'Persone vicine che si capiscono',
+        ['capisce', 'insieme'],
+      ),
+      scene('capire-7', 'affirmative', 'Farsi capire si può fare in tanti modi, e tutti vanno bene.', 'parole', 'Tre nuvolette diverse', [
+        'tanti modi',
+      ]),
+    ],
+    check: {
+      question: 'Cosa puoi fare se non ti capiscono subito?',
+      options: [
+        {
+          id: 'capire-si',
+          text: 'Indicare, fare un gesto o mostrare una figura',
+          correct: true,
+          feedback: 'Sì: sono tutti modi per farsi capire, e vanno bene come le parole.',
+        },
+        {
+          id: 'capire-no',
+          text: 'Stare in silenzio e lasciar perdere',
+          correct: false,
+          feedback: 'La storia propone un’altra strada: indicare o mostrare una figura. Rileggi la pagina e prova.',
+        },
+      ],
+    },
+  },
+  {
+    id: 'chiedo-una-pausa',
+    title: 'Posso chiedere una pausa',
+    category: 'emotional_coping',
+    protagonist: '',
+    goal: 'Usare la carta della pausa quando stanchezza o rumore diventano troppi.',
+    createdAt: CREATED,
+    updatedAt: CREATED,
+    native: true,
+    scenes: [
+      scene('pausa-1', 'descriptive', 'A scuola e a casa faccio tante attività: lavoro, gioco, ascolto.', 'scuola', 'La scuola', [
+        'attività',
+      ]),
+      scene(
+        'pausa-2',
+        'descriptive',
+        'A volte la mia testa e il mio corpo si stancano, oppure intorno c’è tanto rumore.',
+        'cuffie',
+        'Cuffie antirumore',
+        ['si stancano', 'rumore'],
+      ),
+      scene(
+        'pausa-3',
+        'perspective',
+        'Quando sono stanc{o|a}, può essere difficile ascoltare e parlare.',
+        'bambino',
+        'Un bambino stanco',
+        ['stanc', 'difficile'],
+      ),
+      scene(
+        'pausa-4',
+        'perspective',
+        'Le maestre e i miei genitori vogliono sapere quando ho bisogno di riposare.',
+        'famiglia',
+        'Adulti vicini e attenti',
+        ['vogliono sapere'],
+      ),
+      scene(
+        'pausa-5',
+        'coaching',
+        'Posso mostrare la carta della pausa, oppure dire «pausa».',
+        'pausa',
+        'Una mano aperta: la carta della pausa',
+        ['carta della pausa'],
+      ),
+      scene(
+        'pausa-6',
+        'descriptive',
+        'Dopo una pausa breve, spesso mi sento meglio e torno alle mie attività.',
+        'respiro',
+        'Una spirale che indica un respiro lento',
+        ['mi sento meglio'],
+      ),
+      scene(
+        'pausa-7',
+        'affirmative',
+        'Chiedere una pausa è un modo gentile di prendersi cura di sé.',
+        'pallamorbida',
+        'Una palla morbida',
+        ['prendersi cura'],
+      ),
+    ],
+    check: {
+      question: 'Cosa puoi fare quando sei stanc{o|a}?',
+      options: [
+        {
+          id: 'pausa-si',
+          text: 'Mostrare la carta della pausa',
+          correct: true,
+          feedback: 'Sì: la carta dice agli adulti che ti serve un momento di riposo.',
+        },
+        {
+          id: 'pausa-no',
+          text: 'Continuare senza dire niente',
+          correct: false,
+          feedback: 'Si può fare, ma la storia propone di farlo sapere con la carta. Rileggi la pagina e prova.',
+        },
+      ],
+    },
+  },
+  {
+    id: 'vado-in-logopedia',
+    title: 'Vado in logopedia',
+    category: 'daily_routines',
+    protagonist: '',
+    goal: 'Sapere cosa succede in logopedia e arrivarci con meno ansia.',
+    createdAt: CREATED,
+    updatedAt: CREATED,
+    native: true,
+    scenes: [
+      scene('logo-1', 'descriptive', 'Alcuni giorni vado in logopedia.', 'logopedia', 'Un viso e una nuvoletta di parole', [
+        'logopedia',
+      ]),
+      scene(
+        'logo-2',
+        'descriptive',
+        'In logopedia giochiamo con i suoni, con le parole e con il ritmo della voce.',
+        'musica',
+        'Due note musicali',
+        ['suoni', 'parole', 'ritmo'],
+      ),
+      scene(
+        'logo-3',
+        'perspective',
+        'La persona che lavora con me sa che alcune parole sono faticose, e mi aspetta con calma.',
+        'maestra',
+        'Una persona che ascolta',
+        ['con calma'],
+      ),
+      scene(
+        'logo-4',
+        'descriptive',
+        'A volte registriamo la mia voce, così possiamo ascoltarla insieme.',
+        'tablet',
+        'Un tablet',
+        ['registriamo', 'insieme'],
+      ),
+      scene(
+        'logo-5',
+        'coaching',
+        'Se una parola è difficile, posso fare un respiro e provare di nuovo, piano piano.',
+        'respiro',
+        'Una spirale che indica un respiro lento',
+        ['respiro', 'piano piano'],
+      ),
+      scene('logo-6', 'affirmative', 'Ogni volta che provo, la mia bocca impara un pezzetto in più.', 'parole', 'Nuvolette di parole', [
+        'impara',
+      ]),
+      scene('logo-7', 'descriptive', 'Alla fine torno a casa.', 'casa', 'Una casa', ['torno a casa']),
+    ],
+    check: {
+      question: 'Cosa puoi fare se una parola è difficile?',
+      options: [
+        {
+          id: 'logo-si',
+          text: 'Fare un respiro e provare di nuovo, piano piano',
+          correct: true,
+          feedback: 'Sì: il respiro e la calma aiutano la bocca a mettere in fila i suoni.',
+        },
+        {
+          id: 'logo-no',
+          text: 'Dirla velocissima',
+          correct: false,
+          feedback: 'La storia propone di fare con calma: un respiro, poi piano piano. Rileggi la pagina e prova.',
         },
       ],
     },

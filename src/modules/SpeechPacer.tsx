@@ -105,27 +105,39 @@ export function SpeechPacer() {
           question={`Ripeti: ${stimulus.label}`}
           hint="La voce resta attaccata all’onda. Nessuna fretta: puoi fermarla quando vuoi."
         />
-        <div className="flex flex-wrap gap-2" role="group" aria-label="Scegli le sillabe">
-          {PACER_STIMULI.map((item, index) => (
-            <button
-              key={item.id}
-              type="button"
-              aria-pressed={index === stimulusIndex}
-              onClick={() => {
-                setStimulusIndex(index);
-                setPlaying(false);
-                setProgress(0);
-                setStepIndex(-1);
-                setLastSsi(null);
-              }}
-              className={`min-h-16 rounded-full border-2 px-5 text-lg font-bold ${
-                index === stimulusIndex
-                  ? 'border-accent bg-accent-soft text-accent-ink'
-                  : 'border-line bg-surface text-ink'
-              }`}
-            >
-              {item.label}
-            </button>
+        <div className="space-y-2">
+          {(
+            [
+              ['sillabe', 'Sillabe'],
+              ['parole', 'Parole'],
+            ] as const
+          ).map(([group, groupLabel]) => (
+            <div key={group} className="flex flex-wrap items-center gap-2" role="group" aria-label={`Scegli: ${groupLabel.toLowerCase()}`}>
+              <span className="ponti-label w-20">{groupLabel}</span>
+              {PACER_STIMULI.map((item, index) =>
+                item.group !== group ? null : (
+                  <button
+                    key={item.id}
+                    type="button"
+                    aria-pressed={index === stimulusIndex}
+                    onClick={() => {
+                      setStimulusIndex(index);
+                      setPlaying(false);
+                      setProgress(0);
+                      setStepIndex(-1);
+                      setLastSsi(null);
+                    }}
+                    className={`min-h-16 rounded-full border-2 px-5 text-lg font-bold ${
+                      index === stimulusIndex
+                        ? 'border-accent bg-accent-soft text-accent-ink'
+                        : 'border-line bg-surface text-ink'
+                    }`}
+                  >
+                    {item.label}
+                  </button>
+                ),
+              )}
+            </div>
           ))}
         </div>
       </div>
@@ -196,7 +208,7 @@ export function SpeechPacer() {
           )}
           <button
             type="button"
-            onClick={() => void read(stimulus.syllables.map((syllable) => syllable.text.toLowerCase()).join(''))}
+            onClick={() => void read(stimulus.model ?? stimulus.syllables.map((syllable) => syllable.text.toLowerCase()).join(''))}
             className="ponti-btn-secondary"
             disabled={locked}
           >
@@ -220,7 +232,8 @@ export function SpeechPacer() {
       <div className="grid gap-4 lg:grid-cols-[1fr_1fr]">
         <Feedback tone="guide">
           Qui non si valuta l’articolazione: nessun riconoscimento vocale automatico. La registrazione serve al
-          logopedista, che la ascolta e decide.
+          logopedista, che la ascolta e decide. Per l’adulto: usate solo sillabe e parole indicate in terapia e non
+          correggete il suono, tenete solo il ritmo.
         </Feedback>
         <p className="rounded-tile border border-line bg-paper-deep px-4 py-3 text-base text-ink-soft">
           Prova a tenere la voce attaccata da una sfera all’altra, senza fermarti nel mezzo. Se ti fermi, va bene:

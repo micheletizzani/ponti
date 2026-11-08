@@ -70,7 +70,8 @@ export function Landing({ onOpenSettings }: { onOpenSettings: () => void }) {
               <div>
                 <p className="max-w-reading text-xl leading-relaxed text-ink-soft">
                   Sei attività per la logica, la frase, il ritmo della voce, il racconto, il dialogo e le storie sociali. Pensate per
-                  un bambino con disprassia verbale e funzioni esecutive fragili, da fare insieme a un adulto.
+                  un bambino o una bambina con disprassia verbale e funzioni esecutive fragili, da fare insieme a un adulto. Con
+                  uno spazio per la famiglia e uno per la scuola, che parlano la stessa lingua.
                 </p>
                 <div className="mt-7 flex flex-wrap items-center gap-3">
                   <a href="#/app" className="ponti-btn-primary px-7">

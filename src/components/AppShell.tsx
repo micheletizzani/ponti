@@ -1,18 +1,34 @@
 import type { ReactNode } from 'react';
 import { BrandMark } from './Brand';
+import { navigate } from '../lib/router';
+import { useAppStore } from '../lib/store';
+import { handoffLabel } from '../lib/words';
 
+/**
+ * Cinque voci, sempre le stesse: due per il bambino (Oggi, Attività), due per
+ * gli adulti (Famiglia, Scuola) e la Guida. Le aree adulti chiedono la
+ * passphrase se non sono già aperte.
+ */
 const NAV = [
-  { href: '#/app', label: 'Oggi' },
-  { href: '#/app/moduli', label: 'Moduli' },
-  { href: '#/app/progressi', label: 'Progressi' },
-  { href: '#/app/guida', label: 'Guida' },
+  { href: '#/app', label: 'Oggi', match: (path: string) => path === '/app' },
+  {
+    href: '#/app/moduli',
+    label: 'Attività',
+    match: (path: string) =>
+      ['/app/moduli', '/app/sintassi', '/app/matrici', '/app/ritmo', '/app/racconto', '/app/sociale', '/app/storie'].includes(
+        path,
+      ),
+  },
+  { href: '#/app/famiglia', label: 'Famiglia', match: (path: string) => path.startsWith('/app/famiglia') },
+  { href: '#/app/scuola', label: 'Scuola', match: (path: string) => path.startsWith('/app/scuola') },
+  { href: '#/app/guida', label: 'Guida', match: (path: string) => path === '/app/guida' },
 ];
 
 function NavLinks({ current }: { current: string }) {
   return (
     <>
       {NAV.map((item) => {
-        const active = item.href.replace('#', '') === current;
+        const active = item.match(current);
         return (
           <a
             key={item.href}
@@ -27,6 +43,34 @@ function NavLinks({ current }: { current: string }) {
         );
       })}
     </>
+  );
+}
+
+/** Striscia visibile solo quando l'area adulti è aperta: il passaggio del tablet diventa un gesto esplicito. */
+function AdultBar() {
+  const adultOpen = useAppStore((state) => state.adultOpen);
+  const vaultUnlocked = useAppStore((state) => state.vaultUnlocked);
+  const setAdultOpen = useAppStore((state) => state.setAdultOpen);
+  const handoff = useAppStore((state) => handoffLabel(state.profile.gender, state.profile.displayName));
+  if (!adultOpen || !vaultUnlocked) return null;
+  return (
+    <div className="border-b border-place-line bg-place-fill">
+      <div className="mx-auto flex max-w-shell flex-wrap items-center justify-between gap-3 px-4 py-2 sm:px-6">
+        <p className="text-base text-place-ink">
+          <strong>Modalità adulto.</strong> Famiglia e Scuola sono aperte senza passphrase.
+        </p>
+        <button
+          type="button"
+          onClick={() => {
+            setAdultOpen(false);
+            navigate('/app');
+          }}
+          className="ponti-btn-quiet min-h-16 px-4"
+        >
+          {handoff}
+        </button>
+      </div>
+    </div>
   );
 }
 
@@ -70,6 +114,7 @@ export function AppShell({
             <span className="sr-only sm:hidden">Impostazioni di lettura</span>
           </button>
         </div>
+        <AdultBar />
       </header>
 
       <main id="contenuto" tabIndex={-1} className="mx-auto w-full max-w-shell px-4 pb-32 pt-6 sm:px-6 lg:pb-16">
@@ -80,15 +125,15 @@ export function AppShell({
         aria-label="Sezioni dell’app"
         className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-surface px-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-2 lg:hidden"
       >
-        <div className="mx-auto grid max-w-xl grid-cols-4 gap-1">
+        <div className="mx-auto grid max-w-xl grid-cols-5 gap-1">
           {NAV.map((item) => {
-            const active = item.href.replace('#', '') === current;
+            const active = item.match(current);
             return (
               <a
                 key={item.href}
                 href={item.href}
                 aria-current={active ? 'page' : undefined}
-                className={`flex min-h-16 flex-col items-center justify-center rounded-xl text-sm font-bold ${
+                className={`flex min-h-16 flex-col items-center justify-center rounded-xl px-1 text-sm font-bold ${
                   active ? 'bg-accent-soft text-accent-ink' : 'text-ink-soft'
                 }`}
               >

@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import type { ContrastMode, MotionMode, TextSize } from '../types/domain';
+import type { ChildGender, ContrastMode, MotionMode, TextSize } from '../types/domain';
 import { useAppStore } from '../lib/store';
 
 const TEXT_OPTIONS: { value: TextSize; label: string; sample: string }[] = [
@@ -14,6 +14,7 @@ export function SettingsDialog({ open, onClose }: { open: boolean; onClose: () =
   const profile = useAppStore((state) => state.profile);
   const setPreference = useAppStore((state) => state.setPreference);
   const setDisplayName = useAppStore((state) => state.setDisplayName);
+  const setGender = useAppStore((state) => state.setGender);
 
   useEffect(() => {
     const dialog = dialogRef.current;
@@ -139,9 +140,9 @@ export function SettingsDialog({ open, onClose }: { open: boolean; onClose: () =
           </div>
           <div>
             <label htmlFor="profile-name" className="block text-lg font-bold">
-              Come si chiama il bambino
+              Nome di chi usa Ponti
             </label>
-            <p className="mt-1 text-sm text-ink-soft">Resta su questo dispositivo.</p>
+            <p className="mt-1 text-sm text-ink-soft">Compare nel saluto. Resta su questo dispositivo.</p>
             <input
               id="profile-name"
               type="text"
@@ -152,6 +153,34 @@ export function SettingsDialog({ open, onClose }: { open: boolean; onClose: () =
             />
           </div>
         </div>
+
+        <fieldset className="mt-8">
+          <legend className="text-lg font-bold">Bambina o bambino</legend>
+          <p className="mt-1 text-sm text-ink-soft">Serve solo all’italiano: «stanca» o «stanco».</p>
+          <div className="mt-3 grid gap-3 sm:grid-cols-3">
+            {(
+              [
+                { value: 'f', label: 'Bambina' },
+                { value: 'm', label: 'Bambino' },
+                { value: 'n', label: 'Non indicato' },
+              ] as { value: ChildGender; label: string }[]
+            ).map((option) => (
+              <button
+                key={option.value}
+                type="button"
+                onClick={() => setGender(option.value)}
+                aria-pressed={profile.gender === option.value}
+                className={`min-h-16 rounded-tile border-2 px-4 text-base font-bold ${
+                  profile.gender === option.value
+                    ? 'border-accent bg-accent-soft text-accent-ink'
+                    : 'border-line bg-surface hover:border-line-strong'
+                }`}
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>
+        </fieldset>
 
         <div className="mt-8 space-y-2">
           <label className="flex min-h-16 items-center gap-3 rounded-tile border border-line bg-surface px-4">

@@ -39,7 +39,7 @@ test('cassaforte e schermata Oggi senza violazioni WCAG', async ({ page }) => {
   await expectNoViolations(page, 'cassaforte');
 
   await continueWithoutSaving.click();
-  await expect(page.getByRole('heading', { level: 1, name: /Ciao,/ })).toBeVisible();
+  await expect(page.getByRole('heading', { level: 1, name: /Ciao/ })).toBeVisible();
   await expectNoViolations(page, 'Oggi');
 });
 
@@ -50,6 +50,17 @@ const MODULES = [
   { name: 'Trama e nessi', path: '/app/racconto', heading: 'Trama e nessi' },
   { name: 'Social Deck', path: '/app/sociale', heading: 'Social Deck' },
   { name: 'Storie sociali', path: '/app/storie', heading: 'Storie sociali' },
+  { name: 'Attività', path: '/app/moduli', heading: 'Scegli un’attività' },
+  { name: 'La mia giornata', path: '/app/agenda', heading: 'Quale agenda usiamo oggi?' },
+  { name: 'Racconta la giornata', path: '/app/racconta', heading: 'Non ci sono ancora racconti' },
+  { name: 'Come sto', path: '/app/come-sto', heading: 'Come stai adesso?' },
+  { name: 'Spazio famiglia', path: '/app/famiglia', heading: 'Spazio famiglia' },
+  { name: 'Spazio scuola', path: '/app/scuola', heading: 'Spazio scuola' },
+  { name: 'Diario', path: '/app/scuola/diario', heading: 'Com’è andata la giornata' },
+  { name: 'Obiettivi', path: '/app/famiglia/obiettivi', heading: 'Pochi obiettivi, la stessa strada' },
+  { name: 'Agende', path: '/app/scuola/agende', heading: 'La giornata, una carta alla volta' },
+  { name: 'Scambio', path: '/app/famiglia/scambio', heading: 'Invia o ricevi dalla scuola' },
+  { name: 'Progressi', path: '/app/progressi', heading: 'Quello che è successo' },
 ] as const;
 
 test('moduli dopo lo sblocco della cassaforte senza violazioni WCAG', async ({ page }) => {
@@ -61,7 +72,7 @@ test('moduli dopo lo sblocco della cassaforte senza violazioni WCAG', async ({ p
   await page.getByLabel('Ripeti la passphrase').fill(passphrase);
   await page.getByRole('button', { name: 'Crea la cassaforte' }).click();
 
-  await expect(page.getByRole('heading', { level: 1, name: /Ciao,/ })).toBeVisible({ timeout: 20_000 });
+  await expect(page.getByRole('heading', { level: 1, name: /Ciao/ })).toBeVisible({ timeout: 20_000 });
 
   const results: { screen: string; violations: Violations }[] = [];
   for (const module of MODULES) {
@@ -77,6 +88,14 @@ test('moduli dopo lo sblocco della cassaforte senza violazioni WCAG', async ({ p
     .map((result) => `Violazioni WCAG in ${result.screen}:\n${formatViolations(result.violations)}`)
     .join('\n\n');
   expect(failures, details).toEqual([]);
+});
+
+test('area adulti chiusa senza violazioni WCAG', async ({ page }) => {
+  await page.goto('/#/app/famiglia');
+  await page.getByRole('button', { name: 'Continua senza salvare' }).click();
+  await expect(page.getByRole('heading', { level: 1, name: 'Spazio famiglia' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Apri la cassaforte per entrare' })).toBeVisible();
+  await expectNoViolations(page, 'area adulti senza cassaforte');
 });
 
 test('guida senza violazioni WCAG', async ({ page }) => {

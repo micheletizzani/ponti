@@ -1,3 +1,4 @@
+import type { TopicIconName } from '../data/content';
 /** Onda continua: il segno grafico che lega fra loro i sei moduli. */
 export function WaveMotif({ className = '', nodes = true }: { className?: string; nodes?: boolean }) {
   return (
@@ -43,7 +44,7 @@ export function BrandMark({ size = 40 }: { size?: number }) {
 }
 
 /** Piccole icone di argomento, geometriche e coerenti, senza emoji di sistema. */
-export function TopicIcon({ name, size = 48 }: { name: 'dino' | 'train' | 'cat' | 'pencil' | 'music' | 'wave'; size?: number }) {
+export function TopicIcon({ name, size = 48 }: { name: TopicIconName; size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 48 48" aria-hidden="true" focusable="false">
       {name === 'dino' && (
@@ -80,6 +81,29 @@ export function TopicIcon({ name, size = 48 }: { name: 'dino' | 'train' | 'cat' 
           <path d="M18 34V14l16-4v20" />
           <ellipse cx="14" cy="34" rx="5" ry="4" />
           <ellipse cx="30" cy="30" rx="5" ry="4" />
+        </g>
+      )}
+      {name === 'ball' && (
+        <g fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="24" cy="24" r="14" />
+          <path d="M12 18c8 4 16 4 24 0M12 30c8-4 16-4 24 0M24 10v28" />
+        </g>
+      )}
+      {name === 'book' && (
+        <g fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M24 14c-5-3-11-4-16-3v24c5-1 11 0 16 3 5-3 11-4 16-3V11c-5-1-11 0-16 3z" />
+          <path d="M24 14v24" />
+        </g>
+      )}
+      {name === 'food' && (
+        <g fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M24 16c-8-4-15 2-15 10 0 9 7 14 15 12 8 2 15-3 15-12 0-8-7-14-15-10z" />
+          <path d="M24 16c0-4 2-6 5-7" />
+        </g>
+      )}
+      {name === 'news' && (
+        <g fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M24 8l4 9 10 1-8 7 3 10-9-6-9 6 3-10-8-7 10-1z" />
         </g>
       )}
       {name === 'wave' && (

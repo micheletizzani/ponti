@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { SOURCES } from '../data/adults';
 
 const SECTIONS = [
   { id: 'architettura', label: 'Architettura' },
@@ -7,6 +8,8 @@ const SECTIONS = [
   { id: 'moduli', label: 'Moduli' },
   { id: 'metriche', label: 'Metriche e FHIR' },
   { id: 'privacy', label: 'Privacy e limiti' },
+  { id: 'famiglia-scuola', label: 'Famiglia e scuola' },
+  { id: 'fonti', label: 'Fonti ed evidenze' },
 ];
 
 export function Guide() {
@@ -423,6 +426,8 @@ doc/            documentazione clinica di partenza`}
                   <li>Nessun account, nessuna telemetria, nessuna richiesta di rete.</li>
                   <li>Sessioni e audio cifrati con AES-256-GCM in IndexedDB, cancellabili in un tocco.</li>
                   <li>Storie personalizzate, foto e voci registrate cifrate con la stessa chiave della cassaforte.</li>
+                  <li>Diario, obiettivi e agende personalizzate cifrati record per record.</li>
+                  <li>Scambio casa-scuola con file cifrato (AES-256-GCM, chiave da una parola concordata a voce).</li>
                   <li>Chiave derivata con PBKDF2-SHA-256 (310.000 iterazioni) e tenuta solo in memoria.</li>
                   <li>Pseudonimo nel profilo; l’esportazione non include audio.</li>
                   <li>Nessun ASR commerciale: il giudizio resta umano.</li>
@@ -431,7 +436,10 @@ doc/            documentazione clinica di partenza`}
               <div className="rounded-card border-2 border-agent-line bg-agent-fill p-5">
                 <h3 className="text-lg font-bold text-agent-ink">Cosa manca prima dell’uso reale</h3>
                 <ul className="mt-2 space-y-2 text-base text-agent-ink">
-                  <li>Non esiste autenticazione per il pannello clinico né separazione dei ruoli.</li>
+                  <li>
+                    Famiglia e Scuola non sono ruoli separati: sullo stesso dispositivo condividono la passphrase e
+                    vedono gli stessi dati. Il cancello serve contro gli accessi per sbaglio, non contro un adulto.
+                  </li>
                   <li>L’esportazione JSON è in chiaro: va condivisa solo con chi segue il bambino.</li>
                   <li>Nome e preferenze restano in localStorage, fuori dalla cassaforte.</li>
                   <li>Non esiste recupero della passphrase: se si dimentica, i dati non si riaprono.</li>
@@ -472,7 +480,10 @@ doc/            documentazione clinica di partenza`}
             <h3 className="mt-8 text-xl">Prossimi passi tecnici</h3>
             <ol className="mt-2 space-y-2 text-base text-ink-soft">
               <li>1. Cifratura anche del profilo locale e delle preferenze.</li>
-              <li>2. Pannello clinico autenticato con ruoli separati e audit locale delle esportazioni.</li>
+              <li>
+                2. Ruoli davvero separati (chiavi distinte per famiglia e scuola) e, se la scuola lo richiede, un
+                server conforme con valutazione d’impatto (DPIA).
+              </li>
               <li>3. Endpoint FHIR e validazione dei mapping LOINC/SNOMED con il logopedista.</li>
               <li>4. Confronto sovrapposto modello/registrazione e revisione asincrona del clinico.</li>
               <li>5. Packaging Capacitor con permessi microfono dichiarati e test su tablet reali.</li>
@@ -483,6 +494,76 @@ doc/            documentazione clinica di partenza`}
               Riferimenti di progetto: ISO 21801-1:2020, W3C COGA, WCAG 2.2, HL7 FHIR R4/R5, letteratura White-Sutton
               / POGZ raccolta in <em>doc/</em>.
             </p>
+          </section>
+
+          <section id="famiglia-scuola" className="scroll-mt-28" aria-labelledby="famiglia-scuola-heading">
+            <h2 id="famiglia-scuola-heading" className="text-3xl">
+              7. Famiglia e scuola
+            </h2>
+            <p className="mt-3 max-w-reading text-base text-ink-soft">
+              Due spazi con gli stessi strumenti, scritti per chi li usa. Lo stesso linguaggio a casa e a scuola è il
+              punto: stessa scala di aiuto, stesse carte, stessi connettivi.
+            </p>
+            <dl className="mt-5 grid gap-3 sm:grid-cols-2">
+              {[
+                [
+                  'Diario scuola-casa',
+                  'Nota veloce: com’è andata, fino a tre momenti, una cosa bella, cosa deve sapere l’altro adulto. I momenti, scritti in prima persona, diventano le carte di «Racconta la giornata» e la tessera Novità del Social Deck.',
+                ],
+                [
+                  'Obiettivi condivisi',
+                  'Libreria di dieci obiettivi derivati dal profilo in doc/, ordinati con le quattro dimensioni del PEI. Ogni obiettivo ha una strategia unica; le osservazioni usano la scala 1–4 delle attività.',
+                ],
+                [
+                  'Agende visive',
+                  'Cinque agende pronte e un editor con simboli offline, pittogrammi ARASAAC o immagini. Il bambino le vede in «La mia giornata», tutte o solo «Prima / Poi».',
+                ],
+                [
+                  'Scambio cifrato',
+                  'Per due dispositivi: un file .ponti cifrato con una parola di scambio. All’importazione le note nuove si aggiungono, le osservazioni si sommano, nulla viene cancellato.',
+                ],
+              ].map(([title, text]) => (
+                <div key={title} className="rounded-card border border-line bg-surface p-5">
+                  <dt className="text-lg font-bold">{title}</dt>
+                  <dd className="mt-1 text-base text-ink-soft">{text}</dd>
+                </div>
+              ))}
+            </dl>
+            <p className="mt-4 max-w-reading text-sm text-ink-soft">
+              «Come sto» non salva niente: un registro delle emozioni del bambino sarebbe un dato sensibile in più,
+              senza un uso clinico definito.
+            </p>
+          </section>
+
+          <section id="fonti" className="scroll-mt-28" aria-labelledby="fonti-heading">
+            <h2 id="fonti-heading" className="text-3xl">
+              8. Fonti e solidità delle indicazioni
+            </h2>
+            <p className="mt-3 max-w-reading text-base text-ink-soft">
+              Le indicazioni per famiglia e scuola citano da dove vengono. Alcune fonti sono state lette solo come
+              abstract o tramite sintesi: la colonna a destra lo dice.
+            </p>
+            <div className="mt-5 overflow-x-auto rounded-card border border-line">
+              <table className="w-full min-w-[40rem] text-left text-base">
+                <caption className="sr-only">Fonti usate e solidità delle prove</caption>
+                <thead className="bg-paper-deep">
+                  <tr>
+                    <th scope="col" className="p-3">Fonte</th>
+                    <th scope="col" className="p-3">Cosa dice</th>
+                    <th scope="col" className="p-3">Quanto è solida</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {SOURCES.map((source) => (
+                    <tr key={source.id} className="border-t border-line align-top">
+                      <td className="p-3 text-sm">{source.citation}</td>
+                      <td className="p-3 text-sm text-ink-soft">{source.what}</td>
+                      <td className="p-3 text-sm text-ink-soft">{source.strength}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </section>
         </div>
       </div>

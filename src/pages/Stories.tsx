@@ -1,7 +1,8 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import type { SocialStory, StoryVisual } from '../types/domain';
 import { NATIVE_STORIES } from '../data/socialStories';
-import { categoryLabel, duplicateStory } from '../lib/socialStory';
+import { categoryLabel, duplicateStory, personalizeStory } from '../lib/socialStory';
+import { useAppStore } from '../lib/store';
 import { StoryArt } from '../components/StoryArt';
 import { StoryPlayer } from '../components/StoryPlayer';
 import { StoryStudio } from '../components/StoryStudio';
@@ -28,6 +29,9 @@ export function Stories() {
   const [deleting, setDeleting] = useState<string | null>(null);
   const [adultVerified, setAdultVerified] = useState(false);
   const [caaCount, setCaaCount] = useState<number | null>(null);
+  const gender = useAppStore((state) => state.profile.gender);
+  const adultOpen = useAppStore((state) => state.adultOpen);
+  const setAdultOpen = useAppStore((state) => state.setAdultOpen);
 
   const refresh = async () => {
     setLoading(true);
@@ -55,12 +59,12 @@ export function Stories() {
   }, []);
 
   const requestStudio = (initial?: SocialStory) => {
-    if (adultVerified) setMode({ kind: 'studio', initial });
+    if (adultVerified || adultOpen) setMode({ kind: 'studio', initial });
     else setMode({ kind: 'gate', pending: initial });
   };
 
   if (mode.kind === 'player') {
-    return <StoryPlayer story={mode.story} onExit={() => setMode({ kind: 'library' })} />;
+    return <StoryPlayer story={personalizeStory(mode.story, gender)} onExit={() => setMode({ kind: 'library' })} />;
   }
 
   if (mode.kind === 'studio') {
@@ -84,6 +88,7 @@ export function Stories() {
         onCancel={() => setMode({ kind: 'library' })}
         onVerified={() => {
           setAdultVerified(true);
+          setAdultOpen(true);
           setMode({ kind: 'studio', initial: mode.pending });
         }}
       />
@@ -108,7 +113,7 @@ export function Stories() {
       </header>
 
       <p className="max-w-reading text-lg text-ink-soft">
-        Una storia alla volta, con parole semplici e un’immagine che aiuta. Le tre storie pronte seguono i criteri di
+        Una storia alla volta, con parole semplici e un’immagine che aiuta. Le storie pronte seguono i criteri di
         Carol Gray 10.2: descrivono più di quanto comandano.
       </p>
       <p className="max-w-reading text-xs text-ink-soft">
@@ -147,7 +152,7 @@ export function Stories() {
                 story={story}
                 native
                 onRead={() => setMode({ kind: 'player', story })}
-                onDuplicate={() => requestStudio(duplicateStory(story))}
+                onDuplicate={() => requestStudio(duplicateStory(personalizeStory(story, gender)))}
               />
             </li>
           ))}
@@ -300,7 +305,7 @@ function AdultGate({ onVerified, onCancel }: { onVerified: () => void; onCancel:
     setBusy(false);
     if (!ok) {
       setError(
-        'Passphrase non corretta. Serve quella della cassaforte, non un codice nuovo. Se non l’hai ancora creata, fallo da Progressi.',
+        'Passphrase non corretta. Serve la stessa frase segreta usata per aprire Ponti.',
       );
       return;
     }
@@ -320,7 +325,7 @@ function AdultGate({ onVerified, onCancel }: { onVerified: () => void; onCancel:
         </h1>
         <p className="mt-3 max-w-reading text-base text-ink-soft">
           Creare o modificare una storia richiede la passphrase della cassaforte: serve a evitare modifiche
-          accidentali da parte del bambino. Non viene salvata.
+          accidentali mentre si gioca. Non viene salvata.
         </p>
         <form onSubmit={submit} noValidate className="mt-5 space-y-4">
           {error && (

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import type { ConnectiveId, ScaffoldLevel } from '../types/domain';
-import { CONNECTIVE_LABELS, CONNECTIVE_REASONS, STORIES } from '../data/content';
+import { CONNECTIVE_CONFIRMS, CONNECTIVE_LABELS, CONNECTIVE_REASONS, STORIES } from '../data/content';
 import { FrameArt } from '../components/FrameArt';
 import { ExerciseHeader, Feedback, FinishSession, LockNotice, StepDots, TaskPrompt } from '../components/ui';
 import { useGuidedVoice, useSessionTracker } from '../lib/hooks';
@@ -60,13 +60,7 @@ export function NarrativeWeaver() {
       const next = [...links];
       next[slot] = id;
       setLinks(next);
-      setFeedback({
-        tone: 'confirm',
-        text:
-          slot === 0
-            ? 'Sì: la prima cosa provoca la seconda.'
-            : 'Sì: questa è la conseguenza che viene dopo.',
-      });
+      setFeedback({ tone: 'confirm', text: CONNECTIVE_CONFIRMS[id] });
       tracker.recordRound(true);
       playSoftConfirm();
       return;
@@ -76,7 +70,7 @@ export function NarrativeWeaver() {
     setBlocked((current) => ({ ...current, [slot]: [...(current[slot] ?? []), id] }));
     setFeedback({
       tone: 'guide',
-      text: `${CONNECTIVE_LABELS[id]}: ${CONNECTIVE_REASONS[id]} Guarda il quadro ${slot + 1} e il quadro ${slot + 2}.`,
+      text: `${CONNECTIVE_LABELS[id]}: ${story.reasons?.[slot === 0 ? 0 : 1]?.[id] ?? CONNECTIVE_REASONS[id]} Guarda il quadro ${slot + 1} e il quadro ${slot + 2}.`,
     });
   };
 

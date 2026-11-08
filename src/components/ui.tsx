@@ -70,7 +70,7 @@ export function ScaffoldPicker({
                   {level === 1 && 'La voce descrive tutto, gli elementi si illuminano.'}
                   {level === 2 && 'La voce fa solo le domande chiave.'}
                   {level === 3 && 'Un segnale breve sui punti da guardare.'}
-                  {level === 4 && 'Il bambino dice la regola, poi sceglie.'}
+                  {level === 4 && 'Prima si dice la regola a voce, poi si sceglie.'}
                 </span>
               </span>
             </button>

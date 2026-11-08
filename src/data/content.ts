@@ -124,6 +124,36 @@ export const SYNTAX_ROUNDS: SyntaxRound[] = [
     verbPassive: 'è inseguito da',
     note: 'Inversione inattesa: rompe l’euristica “il primo nome compie l’azione”.',
   },
+  {
+    id: 'bimbo-bimba',
+    question: 'Chi insegue chi, nel gioco?',
+    agent: 'bimbo',
+    patient: 'bimba',
+    action: 'inseguire',
+    verbActive: 'insegue',
+    verbPassive: 'è inseguito da',
+    note: 'Paziente femminile: al passivo il participio concorda con il soggetto («è inseguita»).',
+  },
+  {
+    id: 'topo-gatto-saluta',
+    question: 'Chi saluta chi?',
+    agent: 'topo',
+    patient: 'gatto',
+    action: 'salutare',
+    verbActive: 'saluta',
+    verbPassive: 'è salutato da',
+    note: 'Scena poco probabile nel mondo reale: la strategia “chi è più forte agisce” non aiuta.',
+  },
+  {
+    id: 'gatto-cane-spinge',
+    question: 'Chi spinge chi, questa volta?',
+    agent: 'gatto',
+    patient: 'cane',
+    action: 'spingere',
+    verbActive: 'spinge',
+    verbPassive: 'è spinto da',
+    note: 'Stessa coppia del secondo round con i ruoli invertiti: controlla l’effetto memoria.',
+  },
 ];
 
 /* ------------------------------------------------------------------ */
@@ -236,15 +266,127 @@ export const MATRIX_ROUNDS: MatrixRound[] = [
     questionL2: 'Il colore della riga in basso: quale è? E la forma della colonna a destra?',
     cue: 'Cerchio. Rosso.',
   },
+  {
+    id: 'triangolo-quadrato',
+    cells: [
+      { shape: 'triangolo', color: 'verde' },
+      { shape: 'triangolo', color: 'rosso' },
+      { shape: 'quadrato', color: 'verde' },
+      null,
+    ],
+    options: [
+      {
+        id: 'quadrato-rosso',
+        shape: 'quadrato',
+        color: 'rosso',
+        correct: true,
+        reason: 'Quadrato come la riga in basso, rosso come la colonna a destra.',
+      },
+      {
+        id: 'triangolo-rosso',
+        shape: 'triangolo',
+        color: 'rosso',
+        correct: false,
+        reason: 'Il colore è giusto, ma nella riga in basso la forma è un quadrato.',
+      },
+      {
+        id: 'quadrato-verde',
+        shape: 'quadrato',
+        color: 'verde',
+        correct: false,
+        reason: 'La forma è giusta, ma nella colonna a destra il colore è rosso.',
+      },
+    ],
+    rule: 'In alto ci sono triangoli, in basso quadrati. A sinistra il colore è verde, a destra è rosso. Serve un quadrato rosso.',
+    questionL2: 'Che forma c’è nella riga in basso? Che colore c’è nella colonna a destra?',
+    cue: 'Quadrato. Rosso.',
+  },
+  {
+    id: 'cerchio-triangolo-giallo',
+    cells: [
+      { shape: 'cerchio', color: 'blu' },
+      { shape: 'triangolo', color: 'blu' },
+      { shape: 'cerchio', color: 'giallo' },
+      null,
+    ],
+    options: [
+      {
+        id: 'triangolo-blu',
+        shape: 'triangolo',
+        color: 'blu',
+        correct: false,
+        reason: 'La forma è giusta, ma il blu è il colore della riga in alto.',
+      },
+      {
+        id: 'triangolo-giallo',
+        shape: 'triangolo',
+        color: 'giallo',
+        correct: true,
+        reason: 'Triangolo come la colonna a destra, giallo come la riga in basso.',
+      },
+      {
+        id: 'quadrato-giallo',
+        shape: 'quadrato',
+        color: 'giallo',
+        correct: false,
+        reason: 'Il colore è giusto, ma nella colonna a destra la forma è un triangolo.',
+      },
+    ],
+    rule: 'La riga in alto è blu, la riga in basso è gialla. A sinistra ci sono cerchi, a destra triangoli. Serve un triangolo giallo.',
+    questionL2: 'Che colore ha la riga in basso? Che forma c’è nella colonna a destra?',
+    cue: 'Triangolo. Giallo.',
+  },
+  {
+    id: 'trappola-copia',
+    cells: [
+      { shape: 'quadrato', color: 'giallo' },
+      { shape: 'cerchio', color: 'giallo' },
+      { shape: 'quadrato', color: 'verde' },
+      null,
+    ],
+    options: [
+      {
+        id: 'quadrato-giallo',
+        shape: 'quadrato',
+        color: 'giallo',
+        correct: false,
+        reason: 'È uguale al primo pezzo in alto. Qui servono il colore della riga in basso e la forma della colonna a destra.',
+      },
+      {
+        id: 'cerchio-giallo',
+        shape: 'cerchio',
+        color: 'giallo',
+        correct: false,
+        reason: 'La forma è giusta, ma il giallo è il colore della riga in alto.',
+      },
+      {
+        id: 'cerchio-verde',
+        shape: 'cerchio',
+        color: 'verde',
+        correct: true,
+        reason: 'Cerchio come la colonna a destra, verde come la riga in basso.',
+      },
+    ],
+    rule: 'In alto il colore è giallo, in basso è verde. A sinistra ci sono quadrati, a destra cerchi. Serve un cerchio verde.',
+    questionL2: 'Guarda la riga in basso: che colore? Guarda la colonna a destra: che forma?',
+    cue: 'Cerchio. Verde.',
+  },
 ];
 
 /* ------------------------------------------------------------------ */
 /* Speech Pacer                                                        */
 /* ------------------------------------------------------------------ */
 
+/**
+ * Due gruppi. Le sillabe senza significato isolano ritmo e accento; le parole
+ * vere li portano nel lessico quotidiano. L'adulto usa solo quelle indicate dal
+ * logopedista: la scelta degli stimoli per la DVE è clinica, non dell'app.
+ * Gli accenti seguono le tre forme dell'italiano: piana, tronca, sdrucciola.
+ */
 export const PACER_STIMULI: PacerStimulus[] = [
   {
     id: 'ba-ba',
+    group: 'sillabe',
     syllables: [
       { text: 'BA', stressed: true },
       { text: 'ba', stressed: false },
@@ -254,15 +396,18 @@ export const PACER_STIMULI: PacerStimulus[] = [
   },
   {
     id: 'ba-ba-inv',
+    group: 'sillabe',
     syllables: [
       { text: 'ba', stressed: false },
       { text: 'BA', stressed: true },
     ],
     label: 'ba-BA',
     hint: 'Piccolo, poi grande: l’accento va alla fine.',
+    model: 'babà',
   },
   {
     id: 'to-ki',
+    group: 'sillabe',
     syllables: [
       { text: 'TO', stressed: true },
       { text: 'ki', stressed: false },
@@ -272,6 +417,7 @@ export const PACER_STIMULI: PacerStimulus[] = [
   },
   {
     id: 'ma-ta-ka',
+    group: 'sillabe',
     syllables: [
       { text: 'MA', stressed: true },
       { text: 'ta', stressed: false },
@@ -279,6 +425,77 @@ export const PACER_STIMULI: PacerStimulus[] = [
     ],
     label: 'MA-ta-ka',
     hint: 'Tre sillabe legate: una grande e due piccole.',
+    model: 'màtaka',
+  },
+  {
+    id: 'pu-ma-ti',
+    group: 'sillabe',
+    syllables: [
+      { text: 'pu', stressed: false },
+      { text: 'MA', stressed: true },
+      { text: 'ti', stressed: false },
+    ],
+    label: 'pu-MA-ti',
+    hint: 'Piccola, grande, piccola: la sfera grande sta nel mezzo.',
+    model: 'pumàti',
+  },
+  {
+    id: 'luna',
+    group: 'parole',
+    syllables: [
+      { text: 'LU', stressed: true },
+      { text: 'na', stressed: false },
+    ],
+    label: 'LU-na',
+    hint: 'Parola piana: la forza sta sulla prima sillaba.',
+    model: 'luna',
+  },
+  {
+    id: 'papa',
+    group: 'parole',
+    syllables: [
+      { text: 'pa', stressed: false },
+      { text: 'PÀ', stressed: true },
+    ],
+    label: 'pa-PÀ',
+    hint: 'Parola tronca: la forza arriva alla fine.',
+    model: 'papà',
+  },
+  {
+    id: 'patata',
+    group: 'parole',
+    syllables: [
+      { text: 'pa', stressed: false },
+      { text: 'TA', stressed: true },
+      { text: 'ta', stressed: false },
+    ],
+    label: 'pa-TA-ta',
+    hint: 'Tre sillabe, la forza nel mezzo, come quasi tutte le parole italiane.',
+    model: 'patata',
+  },
+  {
+    id: 'banana',
+    group: 'parole',
+    syllables: [
+      { text: 'ba', stressed: false },
+      { text: 'NA', stressed: true },
+      { text: 'na', stressed: false },
+    ],
+    label: 'ba-NA-na',
+    hint: 'Stesso ritmo di patata, suoni diversi.',
+    model: 'banana',
+  },
+  {
+    id: 'tavolo',
+    group: 'parole',
+    syllables: [
+      { text: 'TA', stressed: true },
+      { text: 'vo', stressed: false },
+      { text: 'lo', stressed: false },
+    ],
+    label: 'TA-vo-lo',
+    hint: 'Parola sdrucciola: grande all’inizio, poi due piccole.',
+    model: 'tavolo',
   },
 ];
 
@@ -296,6 +513,13 @@ export const STORIES: Story[] = [
       { id: 'sun', caption: 'È uscito il sole.', art: 'sun' },
     ],
     links: ['quindi', 'dopo'],
+    reasons: [
+      { dopo: 'DOPO dice solo l’ordine. Qui c’è di più: la pioggia è il motivo per cui si apre l’ombrello.' },
+      {
+        quindi: 'QUINDI vorrebbe dire che aprire l’ombrello fa uscire il sole. Il sole esce dopo, e basta.',
+        perche: 'PERCHÉ vorrebbe dire che l’ombrello si apre a causa del sole. Non è così.',
+      },
+    ],
   },
   {
     id: 'cane',
@@ -305,7 +529,51 @@ export const STORIES: Story[] = [
       { id: 'bowl', caption: 'Ha bevuto tutta l’acqua.', art: 'bowl' },
       { id: 'dog-happy', caption: 'Si è sentito meglio.', art: 'dog-happy' },
     ],
-    links: ['quindi', 'dopo'],
+    // Bere è la causa del sentirsi meglio: il secondo legame è QUINDI, non DOPO.
+    links: ['quindi', 'quindi'],
+    reasons: [
+      { dopo: 'DOPO dice solo l’ordine. Qui c’è di più: la sete è il motivo per cui beve.' },
+      { dopo: 'DOPO dice solo l’ordine. Qui c’è di più: bere l’acqua lo fa stare meglio.' },
+    ],
+  },
+  {
+    id: 'torre',
+    title: 'La torre di cubi',
+    frames: [
+      { id: 'tower', caption: 'La bambina ha costruito una torre alta.', art: 'tower' },
+      { id: 'dog-run', caption: 'Il cane è passato correndo vicino alla torre.', art: 'dog' },
+      { id: 'tower-fallen', caption: 'La torre è caduta.', art: 'tower-fallen' },
+    ],
+    links: ['dopo', 'quindi'],
+    reasons: [
+      {
+        quindi: 'QUINDI vorrebbe dire che costruire la torre ha fatto arrivare il cane. Il cane passa dopo, e basta.',
+        perche: 'PERCHÉ vorrebbe dire che la torre è stata costruita a causa del cane. Non è così.',
+      },
+      {
+        dopo: 'DOPO dice solo l’ordine. Qui c’è di più: il cane che corre fa cadere la torre.',
+      },
+    ],
+  },
+  {
+    id: 'campanello',
+    title: 'Il campanello',
+    frames: [
+      { id: 'dog-bark', caption: 'Il cane abbaia forte.', art: 'dog' },
+      { id: 'bell', caption: 'Qualcuno ha suonato il campanello.', art: 'bell' },
+      { id: 'door', caption: 'Il papà apre la porta.', art: 'door' },
+    ],
+    links: ['perche', 'quindi'],
+    reasons: [
+      {
+        dopo: 'Il campanello non suona dopo: ha suonato prima, ed è il motivo per cui il cane abbaia.',
+        quindi: 'QUINDI vorrebbe dire che il cane ha fatto suonare il campanello. È il contrario.',
+        prima: 'PRIMA dice solo quando. Qui la domanda è un’altra: perché il cane abbaia?',
+      },
+      {
+        perche: 'PERCHÉ vorrebbe dire che il campanello suona a causa del papà. Qui il papà apre a causa del campanello.',
+      },
+    ],
   },
 ];
 
@@ -318,8 +586,10 @@ export interface SocialTopic {
   label: string;
   script: string;
   adultPrompt: string;
-  icon: 'dino' | 'train' | 'cat' | 'pencil' | 'music' | 'wave';
+  icon: TopicIconName;
 }
+
+export type TopicIconName = 'dino' | 'train' | 'cat' | 'pencil' | 'music' | 'wave' | 'ball' | 'book' | 'food' | 'news';
 
 export const SOCIAL_TOPICS: SocialTopic[] = [
   {
@@ -364,7 +634,36 @@ export const SOCIAL_TOPICS: SocialTopic[] = [
     adultPrompt: 'Racconta cosa fai in acqua e fai una domanda aperta.',
     icon: 'wave',
   },
+  {
+    id: 'parco',
+    label: 'Giochi al parco',
+    script: 'Al parco mi piace lo scivolo. Scendo veloce! Tu che gioco fai al parco?',
+    adultPrompt: 'Dì il tuo gioco preferito, poi chiedi: «Mi fai vedere come scendi?».',
+    icon: 'ball',
+  },
+  {
+    id: 'libri',
+    label: 'Libri e storie',
+    script: 'Ho letto una storia con un lupo. Alla fine scappa via. Tu conosci una storia di animali?',
+    adultPrompt: 'Racconta in due frasi una storia che conosci. Lascia che sia lui o lei a fare la domanda dopo.',
+    icon: 'book',
+  },
+  {
+    id: 'merenda',
+    label: 'Merenda',
+    script: 'Oggi a merenda ho mangiato la mela. Era dolce. Tu cosa hai mangiato?',
+    adultPrompt: 'Rispondi con il tuo cibo e un aggettivo: «croccante», «dolce», «freddo».',
+    icon: 'food',
+  },
 ];
+
+/** Conferme specifiche per connettivo: dicono che legame è stato riconosciuto. */
+export const CONNECTIVE_CONFIRMS = {
+  prima: 'Sì: la seconda cosa era successa prima.',
+  dopo: 'Sì: una cosa viene dopo l’altra, nel tempo.',
+  perche: 'Sì: la seconda cosa spiega perché è successa la prima.',
+  quindi: 'Sì: la prima cosa provoca la seconda.',
+} as const;
 
 export const CONNECTIVE_LABELS = {
   prima: 'PRIMA',
@@ -381,3 +680,10 @@ export const CONNECTIVE_REASONS = {
 } as const;
 
 export const SCAFFOLD_LABELS = ['Guida piena', 'Domande', 'Piccolo aiuto', 'Lo dico io'] as const;
+
+/** La stessa scala, vista dall'adulto che osserva a casa o a scuola. */
+export const OBSERVATION_LABELS = ['Con guida piena', 'Con domande', 'Con un piccolo aiuto', 'In autonomia'] as const;
+
+export function observationLabel(level: number): string {
+  return OBSERVATION_LABELS[level - 1] ?? OBSERVATION_LABELS[0];
+}

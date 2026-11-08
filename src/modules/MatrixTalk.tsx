@@ -7,6 +7,20 @@ import { RecorderPanel } from '../components/RecorderPanel';
 import { useGuidedVoice, useSessionTracker } from '../lib/hooks';
 import { playSoftConfirm } from '../lib/audio';
 
+/**
+ * Posizione della risposta giusta per ogni round. Nei dati è spesso la prima:
+ * qui la spostiamo, così la posizione non diventa un indizio.
+ */
+const CORRECT_POSITION = [0, 2, 1, 2, 0, 1];
+
+function arrange(round: MatrixRound, index: number): MatrixRound['options'] {
+  const correct = round.options.find((option) => option.correct);
+  const others = round.options.filter((option) => !option.correct);
+  if (!correct) return round.options;
+  const position = Math.min(CORRECT_POSITION[index % CORRECT_POSITION.length] ?? 0, others.length);
+  return [...others.slice(0, position), correct, ...others.slice(position)];
+}
+
 export function MatrixTalk() {
   const [scaffold, setScaffold] = useState<ScaffoldLevel>(1);
   const [roundIndex, setRoundIndex] = useState(0);
@@ -31,6 +45,7 @@ export function MatrixTalk() {
   }, [roundIndex, tracker.resetPromptClock]);
 
   const chosen = round.options.find((option) => option.id === chosenId) ?? null;
+  const options = arrange(round, roundIndex);
 
   const guideText = (): string => {
     if (scaffold === 1) return round.rule;
@@ -135,7 +150,7 @@ export function MatrixTalk() {
           ) : (
             <fieldset disabled={optionsLocked || solved} className="grid gap-3 sm:grid-cols-1">
               <legend className="sr-only">Pezzi possibili</legend>
-              {round.options.map((option) => {
+              {options.map((option) => {
                 const disabledByScaffold = scaffold <= 2 && !option.correct;
                 const disabled = disabledByScaffold || wrongIds.includes(option.id) || optionsLocked || solved;
                 const isChosen = chosenId === option.id;

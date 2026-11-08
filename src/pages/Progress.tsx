@@ -5,6 +5,7 @@ import { formatPercent, formatSeconds, summarizeByModule } from '../lib/metrics'
 import { buildExport } from '../lib/fhir';
 import { useAppStore } from '../lib/store';
 import { MODULES } from '../data/content';
+import { childWords } from '../lib/words';
 
 export function Progress() {
   const profile = useAppStore((state) => state.profile);
@@ -84,7 +85,7 @@ export function Progress() {
       setNewPassphrase('');
       setConfirmPassphrase('');
       setPasswordChanged(
-        `Passphrase cambiata. ${result.sessions} sessioni e ${result.recordings} registrazioni sono state ri-cifrate e restano leggibili.`,
+        `Passphrase cambiata. Ho ri-cifrato ${result.sessions} sessioni, ${result.recordings} registrazioni, ${result.stories} storie e ${result.records} note dell’area adulti: restano tutte leggibili.`,
       );
     } catch (caught) {
       setPasswordError(
@@ -214,155 +215,6 @@ export function Progress() {
             </div>
           </section>
 
-          <section className="rounded-card border border-line bg-paper-deep p-5 sm:p-6" aria-labelledby="dati-heading">
-            <h2 id="dati-heading" className="text-2xl">
-              I tuoi dati
-            </h2>
-            <p className="mt-2 max-w-reading text-base text-ink-soft">
-              {recordings.length === 0
-                ? 'Nessuna registrazione vocale sul dispositivo.'
-                : `${recordings.length} registrazioni vocali sul dispositivo, in attesa di revisione.`}{' '}
-              L’esportazione contiene dati pseudonimizzati e non è cifrata: condividila solo con chi segue il bambino.
-            </p>
-            <p className="mt-2 text-sm text-ink-soft">
-              Cassaforte locale <strong>{vaultUnlocked ? 'aperta' : 'chiusa'}</strong>: AES-256-GCM, chiave derivata
-              dalla passphrase e tenuta solo in memoria.
-            </p>
-            <div className="mt-4 flex flex-wrap gap-3">
-              <button type="button" onClick={download} className="ponti-btn-secondary">
-                Esporta JSON per il clinico
-              </button>
-              {vaultUnlocked && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    lockVault();
-                    setVaultUnlocked(false);
-                  }}
-                  className="ponti-btn-quiet"
-                >
-                  Blocca la cassaforte ora
-                </button>
-              )}
-              {!confirmClear ? (
-                <button type="button" onClick={() => setConfirmClear(true)} className="ponti-btn-quiet">
-                  Cancella dati e passphrase
-                </button>
-              ) : (
-                <div className="flex flex-wrap items-center gap-3 rounded-tile border-2 border-agent-line bg-agent-fill px-4 py-3">
-                  <p className="text-base text-agent-ink">Cancello sessioni, registrazioni e passphrase? Non si può annullare.</p>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      void clearAllData().then(async () => {
-                        setConfirmClear(false);
-                        setCleared(true);
-                        setVaultUnlocked(false);
-                        setEphemeral(false);
-                        await refresh();
-                      });
-                    }}
-                    className="ponti-btn-primary"
-                  >
-                    Sì, cancella
-                  </button>
-                  <button type="button" onClick={() => setConfirmClear(false)} className="ponti-btn-quiet">
-                    No, lascia tutto
-                  </button>
-                </div>
-              )}
-            </div>
-            {cleared && (
-              <p role="status" className="mt-3 text-base text-accent-ink">
-                Dati, registrazioni e passphrase cancellati. Al prossimo accesso potrai crearne una nuova.
-              </p>
-            )}
-          </section>
-
-          {vaultUnlocked && (
-            <details className="rounded-card border border-line bg-surface p-5">
-              <summary className="min-h-16 cursor-pointer list-none text-lg font-bold [&::-webkit-details-marker]:hidden">
-                Cambia la passphrase
-              </summary>
-              <p className="mt-2 max-w-reading text-base text-ink-soft">
-                Serve la passphrase attuale. Sessioni e registrazioni vengono decifrate e ri-cifrate con la nuova; se
-                qualcosa non si legge, il cambio si interrompe e l’archivio resta com’era.
-              </p>
-              <form onSubmit={changePassword} noValidate className="mt-4 space-y-4">
-                {passwordError && (
-                  <p
-                    role="alert"
-                    className="rounded-tile border-2 border-agent-line bg-agent-fill px-4 py-3 text-base text-agent-ink"
-                  >
-                    {passwordError}
-                  </p>
-                )}
-                {passwordChanged && (
-                  <p
-                    role="status"
-                    className="rounded-tile border-2 border-verb-line bg-verb-fill px-4 py-3 text-base text-verb-ink"
-                  >
-                    {passwordChanged}
-                  </p>
-                )}
-                <div>
-                  <label htmlFor="current-passphrase" className="block text-base font-bold">
-                    Passphrase attuale
-                  </label>
-                  <input
-                    id="current-passphrase"
-                    type={showPassphrases ? 'text' : 'password'}
-                    value={currentPassphrase}
-                    onChange={(event) => setCurrentPassphrase(event.target.value)}
-                    autoComplete="current-password"
-                    disabled={passwordBusy}
-                    className="mt-2 min-h-16 w-full rounded-tile border-2 border-line bg-surface px-4 text-lg"
-                  />
-                </div>
-                <div>
-                  <label htmlFor="new-passphrase" className="block text-base font-bold">
-                    Nuova passphrase
-                  </label>
-                  <p className="mt-1 text-sm text-ink-soft">Almeno 8 caratteri, diversa da quella attuale.</p>
-                  <input
-                    id="new-passphrase"
-                    type={showPassphrases ? 'text' : 'password'}
-                    value={newPassphrase}
-                    onChange={(event) => setNewPassphrase(event.target.value)}
-                    autoComplete="new-password"
-                    disabled={passwordBusy}
-                    className="mt-2 min-h-16 w-full rounded-tile border-2 border-line bg-surface px-4 text-lg"
-                  />
-                </div>
-                <div>
-                  <label htmlFor="confirm-new-passphrase" className="block text-base font-bold">
-                    Ripeti la nuova passphrase
-                  </label>
-                  <input
-                    id="confirm-new-passphrase"
-                    type={showPassphrases ? 'text' : 'password'}
-                    value={confirmPassphrase}
-                    onChange={(event) => setConfirmPassphrase(event.target.value)}
-                    autoComplete="new-password"
-                    disabled={passwordBusy}
-                    className="mt-2 min-h-16 w-full rounded-tile border-2 border-line bg-surface px-4 text-lg"
-                  />
-                </div>
-                <label className="flex min-h-16 items-center gap-3 rounded-tile border border-line bg-surface px-4">
-                  <input
-                    type="checkbox"
-                    checked={showPassphrases}
-                    onChange={(event) => setShowPassphrases(event.target.checked)}
-                    className="h-6 w-6 accent-[var(--accent)]"
-                  />
-                  <span className="text-base">Mostra le passphrase</span>
-                </label>
-                <button type="submit" disabled={passwordBusy} className="ponti-btn-primary">
-                  {passwordBusy ? 'Sto ri-cifrando l’archivio…' : 'Cambia la passphrase'}
-                </button>
-              </form>
-            </details>
-          )}
 
           <details className="rounded-card border border-line bg-surface p-5">
             <summary className="min-h-16 cursor-pointer list-none text-lg font-bold [&::-webkit-details-marker]:hidden">
@@ -375,11 +227,11 @@ export function Progress() {
               </div>
               <div>
                 <dt className="font-bold text-ink">Livello di aiuto</dt>
-                <dd>Da 1 (guida completa) a 4 (il bambino verbalizza la regola). Più alto è meglio è, ma si scende quando serve.</dd>
+                <dd>Da 1 (guida completa) a 4 (la regola viene detta a voce senza aiuto). Più alto è meglio è, ma si scende quando serve.</dd>
               </div>
               <div>
                 <dt className="font-bold text-ink">Frasi reversibili</dt>
-                <dd>Quota di frasi in cui il bambino assegna correttamente agente e paziente, in forma attiva o passiva.</dd>
+                <dd>Quota di frasi in cui {childWords(profile.gender, '').noun} assegna correttamente agente e paziente, in forma attiva o passiva.</dd>
               </div>
               <div>
                 <dt className="font-bold text-ink">Pausa intersillabica</dt>
@@ -390,6 +242,160 @@ export function Progress() {
               </div>
             </dl>
           </details>
+        </>
+      )}
+
+      {vaultUnlocked && !loading && (
+        <>
+        <section className="rounded-card border border-line bg-paper-deep p-5 sm:p-6" aria-labelledby="dati-heading">
+          <h2 id="dati-heading" className="text-2xl">
+            I tuoi dati
+          </h2>
+          <p className="mt-2 max-w-reading text-base text-ink-soft">
+            {recordings.length === 0
+              ? 'Nessuna registrazione vocale sul dispositivo.'
+              : `${recordings.length} registrazioni vocali sul dispositivo, in attesa di revisione.`}{' '}
+            L’esportazione contiene dati pseudonimizzati e non è cifrata: condividila solo con chi segue {childWords(profile.gender, '').noun}.
+          </p>
+          <p className="mt-2 text-sm text-ink-soft">
+            Cassaforte locale <strong>{vaultUnlocked ? 'aperta' : 'chiusa'}</strong>: AES-256-GCM, chiave derivata
+            dalla passphrase e tenuta solo in memoria.
+          </p>
+          <div className="mt-4 flex flex-wrap gap-3">
+            <button type="button" onClick={download} className="ponti-btn-secondary">
+              Esporta JSON per il clinico
+            </button>
+            {vaultUnlocked && (
+              <button
+                type="button"
+                onClick={() => {
+                  lockVault();
+                  setVaultUnlocked(false);
+                }}
+                className="ponti-btn-quiet"
+              >
+                Blocca la cassaforte ora
+              </button>
+            )}
+            {!confirmClear ? (
+              <button type="button" onClick={() => setConfirmClear(true)} className="ponti-btn-quiet">
+                Cancella dati e passphrase
+              </button>
+            ) : (
+              <div className="flex flex-wrap items-center gap-3 rounded-tile border-2 border-agent-line bg-agent-fill px-4 py-3">
+                <p className="text-base text-agent-ink">Cancello sessioni, registrazioni, storie, diario, obiettivi, agende e passphrase? Non si può annullare.</p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    void clearAllData().then(async () => {
+                      setConfirmClear(false);
+                      setCleared(true);
+                      setVaultUnlocked(false);
+                      setEphemeral(false);
+                      await refresh();
+                    });
+                  }}
+                  className="ponti-btn-primary"
+                >
+                  Sì, cancella
+                </button>
+                <button type="button" onClick={() => setConfirmClear(false)} className="ponti-btn-quiet">
+                  No, lascia tutto
+                </button>
+              </div>
+            )}
+          </div>
+          {cleared && (
+            <p role="status" className="mt-3 text-base text-accent-ink">
+              Dati, registrazioni e passphrase cancellati. Al prossimo accesso potrai crearne una nuova.
+            </p>
+          )}
+        </section>
+
+        {vaultUnlocked && (
+          <details className="rounded-card border border-line bg-surface p-5">
+            <summary className="min-h-16 cursor-pointer list-none text-lg font-bold [&::-webkit-details-marker]:hidden">
+              Cambia la passphrase
+            </summary>
+            <p className="mt-2 max-w-reading text-base text-ink-soft">
+              Serve la passphrase attuale. Sessioni, registrazioni, storie e note dell’area adulti vengono decifrate e
+              ri-cifrate con la nuova; se qualcosa non si legge, il cambio si interrompe e l’archivio resta com’era.
+            </p>
+            <form onSubmit={changePassword} noValidate className="mt-4 space-y-4">
+              {passwordError && (
+                <p
+                  role="alert"
+                  className="rounded-tile border-2 border-agent-line bg-agent-fill px-4 py-3 text-base text-agent-ink"
+                >
+                  {passwordError}
+                </p>
+              )}
+              {passwordChanged && (
+                <p
+                  role="status"
+                  className="rounded-tile border-2 border-verb-line bg-verb-fill px-4 py-3 text-base text-verb-ink"
+                >
+                  {passwordChanged}
+                </p>
+              )}
+              <div>
+                <label htmlFor="current-passphrase" className="block text-base font-bold">
+                  Passphrase attuale
+                </label>
+                <input
+                  id="current-passphrase"
+                  type={showPassphrases ? 'text' : 'password'}
+                  value={currentPassphrase}
+                  onChange={(event) => setCurrentPassphrase(event.target.value)}
+                  autoComplete="current-password"
+                  disabled={passwordBusy}
+                  className="mt-2 min-h-16 w-full rounded-tile border-2 border-line bg-surface px-4 text-lg"
+                />
+              </div>
+              <div>
+                <label htmlFor="new-passphrase" className="block text-base font-bold">
+                  Nuova passphrase
+                </label>
+                <p className="mt-1 text-sm text-ink-soft">Almeno 8 caratteri, diversa da quella attuale.</p>
+                <input
+                  id="new-passphrase"
+                  type={showPassphrases ? 'text' : 'password'}
+                  value={newPassphrase}
+                  onChange={(event) => setNewPassphrase(event.target.value)}
+                  autoComplete="new-password"
+                  disabled={passwordBusy}
+                  className="mt-2 min-h-16 w-full rounded-tile border-2 border-line bg-surface px-4 text-lg"
+                />
+              </div>
+              <div>
+                <label htmlFor="confirm-new-passphrase" className="block text-base font-bold">
+                  Ripeti la nuova passphrase
+                </label>
+                <input
+                  id="confirm-new-passphrase"
+                  type={showPassphrases ? 'text' : 'password'}
+                  value={confirmPassphrase}
+                  onChange={(event) => setConfirmPassphrase(event.target.value)}
+                  autoComplete="new-password"
+                  disabled={passwordBusy}
+                  className="mt-2 min-h-16 w-full rounded-tile border-2 border-line bg-surface px-4 text-lg"
+                />
+              </div>
+              <label className="flex min-h-16 items-center gap-3 rounded-tile border border-line bg-surface px-4">
+                <input
+                  type="checkbox"
+                  checked={showPassphrases}
+                  onChange={(event) => setShowPassphrases(event.target.checked)}
+                  className="h-6 w-6 accent-[var(--accent)]"
+                />
+                <span className="text-base">Mostra le passphrase</span>
+              </label>
+              <button type="submit" disabled={passwordBusy} className="ponti-btn-primary">
+                {passwordBusy ? 'Sto ri-cifrando l’archivio…' : 'Cambia la passphrase'}
+              </button>
+            </form>
+          </details>
+        )}
         </>
       )}
     </div>

@@ -1,5 +1,20 @@
-import { db, type EncryptedRecording, type EncryptedSession, type VaultMeta } from './db';
-import type { RecordingMeta, SessionMetric, SocialStory } from '../types/domain';
+import {
+  db,
+  type EncryptedRecord,
+  type EncryptedRecording,
+  type EncryptedSession,
+  type EncryptedStory,
+  type RecordKind,
+  type VaultMeta,
+} from './db';
+import type {
+  DiaryEntry,
+  RecordingMeta,
+  SessionMetric,
+  SharedGoal,
+  SocialStory,
+  VisualSchedule,
+} from '../types/domain';
 
 /**
  * Cassaforte locale.
@@ -229,7 +244,8 @@ export async function unlockVault(passphrase: string): Promise<boolean> {
 }
 
 /**
- * Cambia la passphrase ri-cifrando tutto l'archivio.
+ * Cambia la passphrase ri-cifrando tutto l'archivio: sessioni, registrazioni,
+ * storie personalizzate e record dell'area adulti.
  *
  * I record vengono decifrati e ri-cifrati interamente in memoria; il disco
  * viene toccato solo alla fine, in un'unica transazione. Se la passphrase
@@ -239,7 +255,7 @@ export async function unlockVault(passphrase: string): Promise<boolean> {
 export async function changePassphrase(
   currentPassphrase: string,
   newPassphrase: string,
-): Promise<{ sessions: number; recordings: number }> {
+): Promise<{ sessions: number; recordings: number; stories: number; records: number }> {
   requireCrypto();
 
   if (newPassphrase.trim().length < 8) {
@@ -269,13 +285,29 @@ export async function changePassphrase(
 
   let sessions: SessionMetric[];
   let recordings: RecordingMeta[];
+  let stories: SocialStory[];
+  let records: { id: string; kind: RecordKind; value: unknown }[];
   try {
-    const sessionRows = await db.sessionsEnc.toArray();
-    const recordingRows = await db.recordingsEnc.toArray();
+    const [sessionRows, recordingRows, storyRows, recordRows] = await Promise.all([
+      db.sessionsEnc.toArray(),
+      db.recordingsEnc.toArray(),
+      db.storiesEnc.toArray(),
+      db.recordsEnc.toArray(),
+    ]);
     sessions = await Promise.all(
       sessionRows.map((row) => decryptJson<SessionMetric>(oldKey, row.iv, row.cipher, `session:${row.id}`)),
     );
     recordings = await Promise.all(recordingRows.map((row) => decryptRecordingRow(oldKey, row)));
+    stories = await Promise.all(
+      storyRows.map((row) => decryptJson<SocialStory>(oldKey, row.iv, row.cipher, `story:${row.id}`)),
+    );
+    records = await Promise.all(
+      recordRows.map(async (row) => ({
+        id: row.id,
+        kind: row.kind,
+        value: await decryptJson<unknown>(oldKey, row.iv, row.cipher, `${row.kind}:${row.id}`),
+      })),
+    );
   } catch {
     throw new VaultError(
       'decrypt-failed',
@@ -309,6 +341,18 @@ export async function changePassphrase(
       });
     }
 
+    const encryptedStories: EncryptedStory[] = [];
+    for (const story of stories) {
+      const encrypted = await encryptJson(newKey, story, `story:${story.id}`);
+      encryptedStories.push({ id: story.id, ...encrypted });
+    }
+
+    const encryptedRecords: EncryptedRecord[] = [];
+    for (const record of records) {
+      const encrypted = await encryptJson(newKey, record.value, `${record.kind}:${record.id}`);
+      encryptedRecords.push({ id: record.id, kind: record.kind, ...encrypted });
+    }
+
     const nextMeta: VaultMeta = {
       ...meta,
       salt,
@@ -317,16 +361,29 @@ export async function changePassphrase(
       verifierCipher: verifier.cipher,
     };
 
-    await db.transaction('rw', [db.vault, db.sessionsEnc, db.recordingsEnc], async () => {
-      await db.vault.put(nextMeta);
-      await db.sessionsEnc.clear();
-      await db.recordingsEnc.clear();
-      if (encryptedSessions.length > 0) await db.sessionsEnc.bulkPut(encryptedSessions);
-      if (encryptedRecordings.length > 0) await db.recordingsEnc.bulkPut(encryptedRecordings);
-    });
+    await db.transaction(
+      'rw',
+      [db.vault, db.sessionsEnc, db.recordingsEnc, db.storiesEnc, db.recordsEnc],
+      async () => {
+        await db.vault.put(nextMeta);
+        await db.sessionsEnc.clear();
+        await db.recordingsEnc.clear();
+        await db.storiesEnc.clear();
+        await db.recordsEnc.clear();
+        if (encryptedSessions.length > 0) await db.sessionsEnc.bulkPut(encryptedSessions);
+        if (encryptedRecordings.length > 0) await db.recordingsEnc.bulkPut(encryptedRecordings);
+        if (encryptedStories.length > 0) await db.storiesEnc.bulkPut(encryptedStories);
+        if (encryptedRecords.length > 0) await db.recordsEnc.bulkPut(encryptedRecords);
+      },
+    );
 
     vaultKey = newKey;
-    return { sessions: encryptedSessions.length, recordings: encryptedRecordings.length };
+    return {
+      sessions: encryptedSessions.length,
+      recordings: encryptedRecordings.length,
+      stories: encryptedStories.length,
+      records: encryptedRecords.length,
+    };
   } catch (error) {
     if (error instanceof VaultError) throw error;
     throw new VaultError(
@@ -489,19 +546,97 @@ export async function loadRecordings(): Promise<RecordingMeta[]> {
   }
 }
 
+/* ---------------------------------------------------------------- */
+/* Area adulti: diario, obiettivi, agende                           */
+/* ---------------------------------------------------------------- */
+
+interface RecordTypes {
+  diary: DiaryEntry;
+  goal: SharedGoal;
+  schedule: VisualSchedule;
+}
+
+export async function saveRecord<Kind extends RecordKind>(kind: Kind, value: RecordTypes[Kind]): Promise<boolean> {
+  const key = vaultKey;
+  if (!key) return false;
+  try {
+    const encrypted = await encryptJson(key, value, `${kind}:${value.id}`);
+    await db.recordsEnc.put({ id: value.id, kind, ...encrypted });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/** Salva più record insieme (importazione): tutto o niente. */
+export async function saveRecords(
+  items: { kind: RecordKind; value: DiaryEntry | SharedGoal | VisualSchedule }[],
+): Promise<boolean> {
+  const key = vaultKey;
+  if (!key) return false;
+  try {
+    const rows: EncryptedRecord[] = [];
+    for (const item of items) {
+      const encrypted = await encryptJson(key, item.value, `${item.kind}:${item.value.id}`);
+      rows.push({ id: item.value.id, kind: item.kind, ...encrypted });
+    }
+    if (rows.length > 0) await db.recordsEnc.bulkPut(rows);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export async function loadRecords<Kind extends RecordKind>(kind: Kind): Promise<RecordTypes[Kind][]> {
+  const key = vaultKey;
+  if (!key) return [];
+  try {
+    const rows = await db.recordsEnc.where('kind').equals(kind).toArray();
+    const values: RecordTypes[Kind][] = [];
+    for (const row of rows) {
+      try {
+        values.push(await decryptJson<RecordTypes[Kind]>(key, row.iv, row.cipher, `${kind}:${row.id}`));
+      } catch {
+        /* record illeggibile: lo si ignora senza cancellarlo */
+      }
+    }
+    return values;
+  } catch {
+    return [];
+  }
+}
+
+export async function deleteRecord(id: string): Promise<void> {
+  try {
+    await db.recordsEnc.delete(id);
+  } catch {
+    /* nulla da eliminare */
+  }
+}
+
 /** Cancella dati cifrati, dati legacy e metadati della cassaforte. */
 export async function clearAllData(): Promise<void> {
   vaultKey = null;
   try {
     await db.transaction(
       'rw',
-      [db.sessions, db.recordings, db.sessionsEnc, db.recordingsEnc, db.storiesEnc, db.caaSymbols, db.vault],
+      [
+        db.sessions,
+        db.recordings,
+        db.sessionsEnc,
+        db.recordingsEnc,
+        db.storiesEnc,
+        db.recordsEnc,
+        db.caaSymbols,
+        db.vault,
+      ],
       async () => {
         await db.sessions.clear();
         await db.recordings.clear();
         await db.sessionsEnc.clear();
         await db.recordingsEnc.clear();
         await db.storiesEnc.clear();
+        await db.recordsEnc.clear();
         await db.caaSymbols.clear();
         await db.vault.clear();
       },

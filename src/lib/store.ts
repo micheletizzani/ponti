@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { Preferences, UserProfile } from '../types/domain';
+import type { ChildGender, Preferences, UserProfile } from '../types/domain';
 import { uid } from './metrics';
 
 const DEFAULT_PREFERENCES: Preferences = {
@@ -16,12 +16,20 @@ const DEFAULT_PREFERENCES: Preferences = {
 function createProfile(): UserProfile {
   return {
     id: uid('profile'),
-    displayName: 'Bambino',
+    displayName: '',
     bornYear: null,
     role: 'child',
+    gender: 'n',
     interests: ['dinosauri', 'treni', 'animali', 'disegno'],
     createdAt: new Date().toISOString(),
   };
+}
+
+/** Avanzamento dell'agenda del giorno: solo id e passi fatti, nessun contenuto. */
+export interface AgendaProgress {
+  scheduleId: string;
+  date: string;
+  done: string[];
 }
 
 interface AppState {
@@ -31,11 +39,23 @@ interface AppState {
   ephemeral: boolean;
   /** Chiave della cassaforte presente in memoria (mai persistita). */
   vaultUnlocked: boolean;
+  /**
+   * Area adulti aperta in questa sessione. Si apre quando l'adulto inserisce la
+   * passphrase e si chiude con «Passa al bambino»: mai persistita.
+   */
+  adultOpen: boolean;
+  /** Agenda scelta dall'adulto per oggi. */
+  activeScheduleId: string | null;
+  agendaProgress: AgendaProgress | null;
   setEphemeral: (value: boolean) => void;
   setVaultUnlocked: (value: boolean) => void;
+  setAdultOpen: (value: boolean) => void;
   setPreference: <Key extends keyof Preferences>(key: Key, value: Preferences[Key]) => void;
   setDisplayName: (name: string) => void;
+  setGender: (gender: ChildGender) => void;
   setInterests: (interests: string[]) => void;
+  setActiveSchedule: (id: string | null) => void;
+  setAgendaProgress: (progress: AgendaProgress | null) => void;
   resetProfile: () => void;
 }
 
@@ -46,19 +66,46 @@ export const useAppStore = create<AppState>()(
       preferences: DEFAULT_PREFERENCES,
       ephemeral: false,
       vaultUnlocked: false,
+      adultOpen: false,
+      activeScheduleId: null,
+      agendaProgress: null,
       setEphemeral: (ephemeral) => set({ ephemeral }),
-      setVaultUnlocked: (vaultUnlocked) => set({ vaultUnlocked }),
+      setVaultUnlocked: (vaultUnlocked) =>
+        set((state) => ({ vaultUnlocked, adultOpen: vaultUnlocked ? state.adultOpen : false })),
+      setAdultOpen: (adultOpen) => set({ adultOpen }),
       setPreference: (key, value) =>
         set((state) => ({ preferences: { ...state.preferences, [key]: value } })),
       setDisplayName: (displayName) =>
-        set((state) => ({ profile: { ...state.profile, displayName: displayName.trim() || 'Bambino' } })),
+        set((state) => ({ profile: { ...state.profile, displayName: displayName.trim() } })),
+      setGender: (gender) => set((state) => ({ profile: { ...state.profile, gender } })),
       setInterests: (interests) => set((state) => ({ profile: { ...state.profile, interests } })),
-      resetProfile: () => set({ profile: createProfile(), preferences: DEFAULT_PREFERENCES }),
+      setActiveSchedule: (activeScheduleId) => set({ activeScheduleId, agendaProgress: null }),
+      setAgendaProgress: (agendaProgress) => set({ agendaProgress }),
+      resetProfile: () =>
+        set({
+          profile: createProfile(),
+          preferences: DEFAULT_PREFERENCES,
+          activeScheduleId: null,
+          agendaProgress: null,
+        }),
     }),
     {
       name: 'ponti-preferences',
-      version: 1,
-      partialize: (state) => ({ profile: state.profile, preferences: state.preferences }),
+      version: 2,
+      partialize: (state) => ({
+        profile: state.profile,
+        preferences: state.preferences,
+        activeScheduleId: state.activeScheduleId,
+        agendaProgress: state.agendaProgress,
+      }),
+      migrate: (persisted, version) => {
+        const state = (persisted ?? {}) as Partial<AppState>;
+        if (version < 2 && state.profile) {
+          const legacyName = state.profile.displayName === 'Bambino' ? '' : state.profile.displayName;
+          state.profile = { ...state.profile, displayName: legacyName ?? '', gender: state.profile.gender ?? 'n' };
+        }
+        return state as AppState;
+      },
     },
   ),
 );

@@ -72,6 +72,49 @@ export function FrameArt({ art, className = '' }: { art: StoryFrame['art']; clas
           <path d="M154 126c14 4 18 16 12 26" fill="none" stroke="#4A3018" strokeWidth="3" strokeLinecap="round" className="motion-safe-pulse" />
         </g>
       )}
+      {art === 'tower' && (
+        <g strokeWidth="2.5">
+          <rect x="96" y="132" width="48" height="30" rx="4" fill="#D2684F" stroke="#7C2C1B" />
+          <rect x="100" y="102" width="40" height="30" rx="4" fill="#5E8DB3" stroke="#1F4665" />
+          <rect x="104" y="72" width="32" height="30" rx="4" fill="#E7BC4F" stroke="#6E5404" />
+          <rect x="108" y="44" width="24" height="28" rx="4" fill="#7FB08A" stroke="#2C6A3C" />
+          <path d="M60 164h120" stroke="var(--line-strong)" strokeWidth="3" strokeLinecap="round" />
+          <circle cx="62" cy="120" r="12" fill="#E4B58D" stroke="#4A2C16" />
+          <path d="M62 132v24M62 140l14-8" stroke="#4A2C16" strokeWidth="3" strokeLinecap="round" fill="none" />
+        </g>
+      )}
+      {art === 'tower-fallen' && (
+        <g strokeWidth="2.5">
+          <rect x="54" y="140" width="48" height="24" rx="4" fill="#D2684F" stroke="#7C2C1B" transform="rotate(-8 78 152)" />
+          <rect x="108" y="138" width="40" height="26" rx="4" fill="#5E8DB3" stroke="#1F4665" transform="rotate(14 128 150)" />
+          <rect x="152" y="136" width="30" height="28" rx="4" fill="#E7BC4F" stroke="#6E5404" transform="rotate(-20 167 150)" />
+          <rect x="96" y="110" width="24" height="26" rx="4" fill="#7FB08A" stroke="#2C6A3C" transform="rotate(30 108 123)" />
+          <path d="M40 166h160" stroke="var(--line-strong)" strokeWidth="3" strokeLinecap="round" />
+          <g stroke="#6E5404" strokeWidth="3" strokeLinecap="round">
+            <path d="M84 92l-8-12M120 84V68M156 92l8-12" />
+          </g>
+        </g>
+      )}
+      {art === 'bell' && (
+        <g strokeWidth="2.5">
+          <rect x="74" y="40" width="92" height="124" rx="12" fill="var(--surface)" stroke="var(--line-strong)" />
+          <circle cx="120" cy="100" r="22" fill="#E7BC4F" stroke="#6E5404" />
+          <circle cx="120" cy="100" r="8" fill="#6E5404" />
+          <g stroke="#6E5404" strokeWidth="3" strokeLinecap="round" fill="none">
+            <path d="M176 82c8 10 8 26 0 36M188 72c14 16 14 40 0 56" />
+            <path d="M64 82c-8 10-8 26 0 36M52 72c-14 16-14 40 0 56" />
+          </g>
+        </g>
+      )}
+      {art === 'door' && (
+        <g strokeWidth="2.5">
+          <rect x="70" y="34" width="100" height="136" rx="6" fill="#F4E9D6" stroke="#4A2C16" />
+          <path d="M70 34l58 14v134l-58-12z" fill="#C9A17A" stroke="#4A2C16" />
+          <circle cx="116" cy="112" r="5" fill="#4A2C16" />
+          <circle cx="150" cy="84" r="13" fill="#E4B58D" stroke="#4A2C16" />
+          <path d="M150 97v40M150 112l-16 10M150 137l-10 24M150 137l10 24" stroke="#4A2C16" strokeWidth="3" strokeLinecap="round" fill="none" />
+        </g>
+      )}
     </svg>
   );
 }
@@ -90,5 +133,13 @@ function artLabel(art: StoryFrame['art']): string {
       return 'Una ciotola piena d’acqua';
     case 'dog-happy':
       return 'Il cane scodinzola, contento';
+    case 'tower':
+      return 'Una torre alta di cubi colorati, accanto a una bambina';
+    case 'tower-fallen':
+      return 'I cubi della torre sono caduti sul pavimento';
+    case 'bell':
+      return 'Un campanello che suona';
+    case 'door':
+      return 'Una porta aperta e una persona sulla soglia';
   }
 }

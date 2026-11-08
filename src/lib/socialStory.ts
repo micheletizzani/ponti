@@ -1,10 +1,12 @@
 import type {
+  ChildGender,
   SocialStory,
   SocialStoryScene,
   StoryCategory,
   StorySentenceType,
 } from '../types/domain';
 import { uid } from './metrics';
+import { genderize } from './words';
 
 export const SENTENCE_TYPES: { value: StorySentenceType; label: string; short: string }[] = [
   {
@@ -152,6 +154,38 @@ export function duplicateStory(story: SocialStory): SocialStory {
           check: {
             question: story.check.question,
             options: story.check.options.map((option) => ({ ...option, id: uid('option') })),
+          },
+        }
+      : {}),
+  };
+}
+
+/**
+ * Accorda una storia al profilo: {o|a} diventa la forma giusta e, nelle storie
+ * pronte, la figura del bambino diventa una bambina quando serve.
+ */
+export function personalizeStory(story: SocialStory, gender: ChildGender): SocialStory {
+  const g = (text: string) => genderize(text, gender);
+  return {
+    ...story,
+    title: g(story.title),
+    goal: g(story.goal),
+    scenes: story.scenes.map((scene) => {
+      const swap = story.native && gender === 'f' && scene.visual.type === 'symbol' && scene.visual.key === 'bambino';
+      return {
+        ...scene,
+        text: g(scene.text),
+        highlightKeywords: scene.highlightKeywords.map(g),
+        visual: swap
+          ? { type: 'symbol' as const, key: 'bambina' as const, altText: scene.visual.altText.replace(/^Un bambino/, 'Una bambina') }
+          : scene.visual,
+      };
+    }),
+    ...(story.check
+      ? {
+          check: {
+            question: g(story.check.question),
+            options: story.check.options.map((option) => ({ ...option, text: g(option.text), feedback: g(option.feedback) })),
           },
         }
       : {}),

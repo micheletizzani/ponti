@@ -136,7 +136,7 @@ export function ScenarioStage({
         viewBox="0 0 560 260"
         className="w-full"
         role="img"
-        aria-label={`Scene: ${STYLES[left].name} e ${STYLES[right].name}. ${action}.`}
+        aria-label={`Scena: ${STYLES[left].name} e ${STYLES[right].name}. Azione: ${action}.`}
       >
         <rect x="18" y="10" width="524" height="238" rx="26" fill="var(--paper-deep)" opacity="0.6" />
         <path d="M40 226h480" stroke="var(--line-strong)" strokeWidth="3" strokeLinecap="round" />
