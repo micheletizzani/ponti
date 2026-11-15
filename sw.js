@@ -1,5 +1,5 @@
 /* Ponti — service worker minimale, offline-first per l'app shell. */
-const CACHE = 'ponti-v1';
+const CACHE = 'ponti-v2';
 
 self.addEventListener('install', () => {
   self.skipWaiting();
@@ -23,7 +23,7 @@ self.addEventListener('fetch', (event) => {
   // Le navigazioni preferiscono la rete, con fallback offline sulla shell.
   if (request.mode === 'navigate') {
     event.respondWith(
-      fetch(request)
+      fetch(request, { cache: 'no-store' })
         .then((response) => {
           const copy = response.clone();
           caches.open(CACHE).then((cache) => cache.put(request, copy));
