@@ -1,5 +1,5 @@
 /* Ponti — service worker versionato per build. */
-const BUILD_ID = 'b15d00064168';
+const BUILD_ID = 'ccccb9306591';
 const CACHE_PREFIX = 'ponti-';
 const CACHE = `${CACHE_PREFIX}${BUILD_ID}`;
 const INDEX_URL = new URL('index.html', self.registration.scope).href;
